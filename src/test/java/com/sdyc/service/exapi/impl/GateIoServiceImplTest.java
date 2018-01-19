@@ -1,8 +1,8 @@
-package com.sdyc.service.impl;
+package com.sdyc.service.exapi.impl;
 
 import com.sdyc.beans.Depth;
 import com.sdyc.beans.PriceBean;
-import com.sdyc.service.DataService;
+import com.sdyc.service.exapi.DataService;
 import com.sdyc.service.TestBaseSetupService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,18 +12,19 @@ import java.util.Arrays;
 /**
  * <pre>
  * User:        yangxun
- * Date:        2018/1/17  16:13
+ * Date:        2018/1/16  16:38
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
  * Company:     陕西识代运筹信息科技有限公司
  * Discription:
  *
- * Modify:      2018/1/17  16:13
+ * Modify:      2018/1/16  16:38
  * Author:
  * </pre>
  */
 
-public class ZbServiceImplTest extends TestBaseSetupService {
+public class GateIoServiceImplTest extends TestBaseSetupService {
+
 
     /**
      * 获取当前的测试类实例
@@ -32,7 +33,7 @@ public class ZbServiceImplTest extends TestBaseSetupService {
      */
     @Override
     protected DataService getTestService() throws Exception {
-        return getFactory().getService("zb");
+        return getFactory().getService("gateIo");
     }
 
     @Test
@@ -41,7 +42,7 @@ public class ZbServiceImplTest extends TestBaseSetupService {
         Assert.assertNotNull(priceBean);
 
 
-        System.out.println(getTestService().getExchangeName()+" testGetPriceData:" + priceBean.getName() + "," + priceBean.getValue());
+        System.out.println(getTestService().getExchangeName() + " testGetPriceData:" + priceBean.getName() + "," + priceBean.getValue());
 
     }
 
@@ -59,11 +60,13 @@ public class ZbServiceImplTest extends TestBaseSetupService {
         Depth[] bids= getTestService().getDeepData("eth", "bids");
         Assert.assertNotNull(bids);
         Assert.assertTrue(bids.length>0);
-        Assert.assertTrue(bids[0].getPrice()> bids[1].getPrice() );
+        Assert.assertTrue(bids[0].getPrice() > bids[1].getPrice());
 
-        System.out.println(getTestService().getExchangeName()+"  testGetDeepData  bids: "+ Arrays.toString(bids));
+        System.out.println(getTestService().getExchangeName() + "  testGetDeepData  bids: " + Arrays.toString(bids));
 
     }
+
+
 
     @Test
     public void testGetBalances() throws Exception {

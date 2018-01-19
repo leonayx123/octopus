@@ -1,5 +1,7 @@
 package com.sdyc.service;
 
+import com.sdyc.service.exapi.DataService;
+import com.sdyc.service.exapi.ExDataServiceFactory;
 import com.sdyc.utils.HttpUtilManager;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;

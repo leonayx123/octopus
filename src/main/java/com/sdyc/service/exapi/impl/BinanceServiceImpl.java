@@ -1,4 +1,4 @@
-package com.sdyc.service.impl;
+package com.sdyc.service.exapi.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -6,7 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.sdyc.beans.AccountBalances;
 import com.sdyc.beans.Depth;
 import com.sdyc.beans.PriceBean;
-import com.sdyc.service.DataService;
+import com.sdyc.service.exapi.DataService;
 import com.sdyc.sys.Config;
 import com.sdyc.utils.HttpUtilManager;
 import org.apache.commons.lang.StringUtils;

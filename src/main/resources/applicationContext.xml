@@ -36,7 +36,7 @@
 
 
 
-    <!-- 引入配置文件 -->
+    <!--&lt;!&ndash; 引入配置文件 &ndash;&gt;-->
     <bean id="handlerInvoking"
           class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
         <property name="targetObject" ref="systemQuartzHandle">

@@ -181,8 +181,19 @@ public class HttpUtilManager {
 	}
 
 
-
-	public String doRequest( String requestType, String url, Map< String, String > arguments,String keyStr,String secertStr)  throws HttpException, IOException{
+	/**
+	 * 币安的请求方法. 有自己的加密形式
+	 * 会把加密的内容放在header
+	 * @param requestType
+	 * @param url
+	 * @param arguments
+	 * @param keyStr
+	 * @param secertStr
+	 * @return
+	 * @throws HttpException
+	 * @throws IOException
+	 */
+	public String doGateIoRequest( String requestType, String url, Map< String, String > arguments,String keyStr,String secertStr)  throws HttpException, IOException{
 
 		List<NameValuePair> urlParameters = new ArrayList<NameValuePair>( );
 

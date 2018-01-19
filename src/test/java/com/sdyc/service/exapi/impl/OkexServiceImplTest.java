@@ -1,8 +1,8 @@
-package com.sdyc.service.impl;
+package com.sdyc.service.exapi.impl;
 
 import com.sdyc.beans.Depth;
 import com.sdyc.beans.PriceBean;
-import com.sdyc.service.DataService;
+import com.sdyc.service.exapi.DataService;
 import com.sdyc.service.TestBaseSetupService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -67,6 +67,7 @@ public class OkexServiceImplTest  extends TestBaseSetupService{
 
     @Test
     public void testGetBalances() throws Exception {
+         getTestService().getBalances();
 
     }
 

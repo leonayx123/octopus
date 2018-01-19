@@ -1,4 +1,4 @@
-package com.sdyc.service.impl;
+package com.sdyc.service.exapi.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -6,44 +6,47 @@ import com.alibaba.fastjson.JSONObject;
 import com.sdyc.beans.AccountBalances;
 import com.sdyc.beans.Depth;
 import com.sdyc.beans.PriceBean;
-import com.sdyc.service.DataService;
+import com.sdyc.service.exapi.DataService;
 import com.sdyc.sys.Config;
 import com.sdyc.utils.HttpUtilManager;
 import com.sdyc.utils.JsonUtils;
 import com.sdyc.utils.MD5Util;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * <pre>
  * User:        yangxun
- * Date:        2018/1/17  16:54
+ * Date:        2018/1/17  15:55
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
  * Company:     陕西识代运筹信息科技有限公司
  * Discription:
+ *  doc address   https://www.zb.com/i/developer/restApi#market
  *
- * Modify:      2018/1/17  16:54
+ * Modify:      2018/1/17  15:55
  * Author:
  * </pre>
  */
-
-public class BitFinexServiceImple implements DataService {
-
+@Component("zbDataService")
+public class ZbServiceImpl  implements DataService{
     // gate.io  api_secret
-    private static String SECRET = "2t9nTJ6psS9uRS8TQMzHUBXkks6DwkdXKvZe63HuhDd";
+    private static String SECRET = "e4ea6a04-8d0f-488f-b10c-412c90d2a1d7";
     //gate.io api key
-    private static String KEY = "cKM4tieVNXeenLinGhIgKcgViADf9a9osCeyNoVU9FO";
+    private static String KEY = "11e3eb0d-f26c-42cf-b43d-fc062aaf6a43";
 
     private  static HashMap<String,String> cpsMap=new HashMap<String, String>();
 
-    private final static String exchangeName="bitFinex";
+    private final static String exchangeName="zb";
 
     static {
         String[] cps=   Config.get("icos.cps").split(",");
-        String[] mycps=   Config.get("icos.bitFinex").split(",");
+        String[] mycps=   Config.get("icos.zb").split(",");
 
         for(int i=0;i<cps.length;i++){
             cpsMap.put(cps[i],mycps[i]);
@@ -91,7 +94,7 @@ public class BitFinexServiceImple implements DataService {
 
         }
 
-        String url="https://api.bitfinex.com/v2/ticker/t"+mycp;
+        String url="http://api.zb.com/data/v1/ticker?market="+mycp;
 
         Double rs=null;
         try {
@@ -99,28 +102,23 @@ public class BitFinexServiceImple implements DataService {
 
             String result = httpUtil.requestHttpGet(url,"");
 
-            JSONArray array= JSON.parseArray(result);
-            /*
-            [
-              BID,
-              BID_SIZE,
-              ASK,
-              ASK_SIZE,
-              DAILY_CHANGE,
-              DAILY_CHANGE_PERC,
-              LAST_PRICE,
-              VOLUME,
-              HIGH,
-              LOW
-            ]
-             */
-            if(array!=null&&array.size()==10){
-               rs=JsonUtils.getDouble(array.get(6));
+            JSONObject resObj= JSON.parseObject(result);
+
+            if(resObj!=null){
+                JSONObject tick=resObj.getJSONObject("ticker");
+
+                if(tick!=null){
+                    rs=Double.parseDouble(tick.getString("last"));
+                }else{
+                    rs=0.0;
+                }
+
             }
 
         } catch (Exception e) {
             throw e;
         }
+
 
 
         return new PriceBean(getExchangeName(),rs);
@@ -143,7 +141,7 @@ public class BitFinexServiceImple implements DataService {
 
         }
 
-        String url="http://api.huobipro.com/market/depth?type=step1&symbol="+mycp;
+        String url="http://api.zb.com/data/v1/depth?size=5&market="+mycp;
 
         Depth[] rs=null;
         JSONArray arrs=null;
@@ -152,9 +150,8 @@ public class BitFinexServiceImple implements DataService {
             HttpUtilManager httpUtil = HttpUtilManager.getInstance();
             String res = httpUtil.requestHttpGet(url, "");
 
-            JSONObject json= JSON.parseObject(res);
+            JSONObject tick= JSON.parseObject(res);
 
-            JSONObject  tick =  json.getJSONObject("tick");
 
             if(type.equals("asks")){
                 arrs =tick.getJSONArray("asks");
@@ -175,10 +172,20 @@ public class BitFinexServiceImple implements DataService {
                 Depth depth=new Depth();
                 //gate io  first is price  second is number
                 Object price=oneData.get(0);
-                Object number=oneData.get(0);
+                Object number=oneData.get(1);
                 depth.setPrice(JsonUtils.getDouble(price));
                 depth.setQuanatity(JsonUtils.getDouble(number));
                 rs[i]=depth;
+            }
+
+            if("asks".equals(type)){
+                Arrays.sort(rs, new Comparator<Depth>() {
+                    @Override
+                    public int compare(Depth o1, Depth o2) {
+                        return Double.compare(o1.getPrice(),o2.getPrice());
+                    }
+                });
+
             }
 
         } catch (Exception e) {
@@ -203,7 +210,7 @@ public class BitFinexServiceImple implements DataService {
         try {
             HttpUtilManager httpUtil = HttpUtilManager.getInstance();
 
-            String result = httpUtil.doRequest("post", apiUrl, params,this.KEY,this.SECRET );
+            String result = httpUtil.doGateIoRequest("post", apiUrl, params,this.KEY,this.SECRET );
 
             if (StringUtils.isBlank(result)){
                 throw  new Exception("没有获取到账号数据");
@@ -233,7 +240,7 @@ public class BitFinexServiceImple implements DataService {
         params.put("amount", String.valueOf(amount));
 
         HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doRequest("post", BUY_URL, params,this.KEY,this.SECRET);
+        String result = httpUtil.doGateIoRequest("post", BUY_URL, params,this.KEY,this.SECRET);
         System.out.print(result);
         return JSON.parseObject(result);
     }
@@ -248,7 +255,7 @@ public class BitFinexServiceImple implements DataService {
         params.put("amount",  String.valueOf(amount));
 
         HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doRequest(  "post", SELL_URL, params,this.KEY,this.SECRET );
+        String result = httpUtil.doGateIoRequest(  "post", SELL_URL, params,this.KEY,this.SECRET );
         System.out.print(result);
         return JSON.parseObject(result);
     }
@@ -260,7 +267,7 @@ public class BitFinexServiceImple implements DataService {
         params.put("orderNumber", orderNumber);
         params.put("currencyPair", mycp);
         HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doRequest( "post", GETORDER_URL, params,this.KEY,this.SECRET  );
+        String result = httpUtil.doGateIoRequest( "post", GETORDER_URL, params,this.KEY,this.SECRET  );
         //System.out.print(result);
         return JSON.parseObject(result);
     }

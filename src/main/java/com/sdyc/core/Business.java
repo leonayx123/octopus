@@ -1,18 +1,20 @@
 package com.sdyc.core;
 
 import com.sdyc.beans.Depth;
+import com.sdyc.beans.IcoAccount;
 import com.sdyc.beans.PriceBean;
-import com.sdyc.service.DataService;
-import com.sdyc.service.ExDataServiceFactory;
+import com.sdyc.service.exapi.DataService;
+import com.sdyc.service.exapi.ExDataServiceFactory;
+import com.sdyc.service.record.RecordService;
 import com.sdyc.sys.Config;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
+import java.util.*;
 
 /**
  * <pre>
@@ -37,10 +39,13 @@ public class Business  {
     @Resource
     TraderCore traderCore;
 
+    @Resource
+    RecordService recordService;
+
 
 
     //所有需要判断的交易对
-    private final  static  String[] cps= Config.get("icos.cps").split(",");
+    private final  static  String[] cps=Config.get("icos.cps").split(",");
 
     private final  static  String[] exNames=Config.get("business.allEx").split(",");
 
@@ -55,7 +60,15 @@ public class Business  {
     //实际工作的业务逻辑
     public void  doWork(){
 
-         for(int i=0;i<cps.length;i++){
+        List<IcoAccount>  accounts=null;
+
+        try {
+            accounts= recordService.getAccountData("111");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for(int i=0;i<cps.length;i++){
 
              String cp=cps[i];
 
@@ -170,9 +183,90 @@ public class Business  {
 
          }
 
+        try {
+
+            String logdir= Config.get("log.dir");
+            File btcLog= new File(logdir+"/output/btclog.csv");
+            File walletLog=new File(logdir+"/output/wallet.csv");
+
+            if(!btcLog.exists()){
+                FileUtils.write(btcLog,"date,init btc, current btc , percent%\n","gb2312");
+
+            }
+
+            //FileUtils.forceDeleteOnExit(walletLog);
 
 
-     }
+
+            StringBuffer walletBf=new StringBuffer();
+            Double currBtc=0.0;
+            Date dt =new Date();
+
+
+            walletBf.
+                     append("exchange")
+                    .append(",").append("btc")
+                    .append(",").append("eth")
+                    .append(",").append("xrp")
+                    .append(",").append("bch")
+                    .append(",").append("ada")
+                    .append(",").append("ltc")
+                    .append(",").append("xem")
+                    .append(",").append("neo")
+                    .append(",").append("xlm")
+                    .append(",").append("iota")
+                    .append(",").append("eos")
+                    .append(",").append("dash")
+                    .append(",").append("trx")
+                    .append(",").append("xmr")
+                    .append(",").append("btg")
+                    .append(",").append("etc")
+                    .append(",").append("icx")
+                    .append(",").append("lsk")
+                    .append(",").append("qtum")
+                    .append(",").append("xrb")
+                    .append(",").append("omg")
+                    .append(",").append("usdt")
+                    .append(",").append("createDate")
+                    .append(",").append("updateDate")
+                    .append("\n");
+
+            for(IcoAccount  account: accounts){
+                account.setUpdateDate(dt);
+
+                walletBf.append(account.toString()).append("\n");
+                currBtc=currBtc+account.getBtc();
+
+             }
+            recordService.setCurrBtc(currBtc);
+
+            double[] btc=recordService.getBtcChange();
+
+            System.out.print("****************wallet********************\n");
+
+            //当前值和上次值不相同 才需要写文件
+            if( btc[1]!=btc[2]){
+                String btcstr=sdf.format(new Date())+","+btc[0]+","+btc[1]+","+( (btc[1]-btc[0])/btc[1]*100)+"%\n";
+                FileUtils.write(btcLog,btcstr,"gb2312",true);
+                System.out.print(btcstr);
+
+
+                FileUtils.write(walletLog,walletBf.toString(),"gb2312",false);
+
+                System.out.print(walletBf.toString());
+            }
+
+
+
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
 
 

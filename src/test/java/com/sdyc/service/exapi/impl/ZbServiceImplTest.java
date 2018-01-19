@@ -1,8 +1,8 @@
-package com.sdyc.service.impl;
+package com.sdyc.service.exapi.impl;
 
 import com.sdyc.beans.Depth;
 import com.sdyc.beans.PriceBean;
-import com.sdyc.service.DataService;
+import com.sdyc.service.exapi.DataService;
 import com.sdyc.service.TestBaseSetupService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,30 +12,28 @@ import java.util.Arrays;
 /**
  * <pre>
  * User:        yangxun
- * Date:        2018/1/16  17:13
+ * Date:        2018/1/17  16:13
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
  * Company:     陕西识代运筹信息科技有限公司
  * Discription:
  *
- * Modify:      2018/1/16  17:13
+ * Modify:      2018/1/17  16:13
  * Author:
  * </pre>
  */
 
-public class BinanceServiceImplTest extends TestBaseSetupService {
+public class ZbServiceImplTest extends TestBaseSetupService {
 
-
-    protected  DataService getTestService(){
-        DataService service=null;
-        try {
-             service= getFactory().getService("binance");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return service;
+    /**
+     * 获取当前的测试类实例
+     *
+     * @return
+     */
+    @Override
+    protected DataService getTestService() throws Exception {
+        return getFactory().getService("zb");
     }
-
 
     @Test
     public void testGetPriceData() throws Exception {
@@ -43,7 +41,7 @@ public class BinanceServiceImplTest extends TestBaseSetupService {
         Assert.assertNotNull(priceBean);
 
 
-        System.out.println(getTestService().getExchangeName() + " testGetPriceData:" + priceBean.getName() + "," + priceBean.getValue());
+        System.out.println(getTestService().getExchangeName()+" testGetPriceData:" + priceBean.getName() + "," + priceBean.getValue());
 
     }
 

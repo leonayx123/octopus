@@ -1,8 +1,8 @@
-package com.sdyc.service.impl;
+package com.sdyc.service.exapi.impl;
 
 import com.sdyc.beans.Depth;
 import com.sdyc.beans.PriceBean;
-import com.sdyc.service.DataService;
+import com.sdyc.service.exapi.DataService;
 import com.sdyc.service.TestBaseSetupService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,28 +12,30 @@ import java.util.Arrays;
 /**
  * <pre>
  * User:        yangxun
- * Date:        2018/1/17  15:14
+ * Date:        2018/1/16  17:13
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
  * Company:     陕西识代运筹信息科技有限公司
  * Discription:
  *
- * Modify:      2018/1/17  15:14
+ * Modify:      2018/1/16  17:13
  * Author:
  * </pre>
  */
 
-public class HuobiproServiceImplTest extends TestBaseSetupService{
+public class BinanceServiceImplTest extends TestBaseSetupService {
 
-    /**
-     * 获取当前的测试类实例
-     *
-     * @return
-     */
-    @Override
-    protected DataService getTestService()throws Exception{
-        return getFactory().getService("huobipro");
+
+    protected  DataService getTestService(){
+        DataService service=null;
+        try {
+             service= getFactory().getService("binance");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return service;
     }
+
 
     @Test
     public void testGetPriceData() throws Exception {
@@ -58,10 +60,10 @@ public class HuobiproServiceImplTest extends TestBaseSetupService{
         //买 要从高到低拍
         Depth[] bids= getTestService().getDeepData("eth", "bids");
         Assert.assertNotNull(bids);
-        Assert.assertTrue(bids.length > 0);
+        Assert.assertTrue(bids.length>0);
         Assert.assertTrue(bids[0].getPrice()> bids[1].getPrice() );
 
-        System.out.println(getTestService().getExchangeName() + "  testGetDeepData  bids: " + Arrays.toString(bids));
+        System.out.println(getTestService().getExchangeName()+"  testGetDeepData  bids: "+ Arrays.toString(bids));
 
     }
 

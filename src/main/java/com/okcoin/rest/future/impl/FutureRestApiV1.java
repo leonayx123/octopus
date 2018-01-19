@@ -2,7 +2,7 @@ package com.okcoin.rest.future.impl;
 
 import com.okcoin.rest.OkexHttpUtilManager;
 import com.okcoin.rest.future.IFutureRestApi;
-import gate.rest.MD5Util;
+import com.sdyc.utils.MD5Util;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpException;
 

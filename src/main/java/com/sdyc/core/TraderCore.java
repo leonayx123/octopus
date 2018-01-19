@@ -1,10 +1,14 @@
 package com.sdyc.core;
 
 import com.sdyc.beans.Depth;
+import com.sdyc.beans.IcoAccount;
+import com.sdyc.service.exapi.ExDataServiceFactory;
+import com.sdyc.service.record.RecordService;
 import com.sdyc.sys.Config;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -31,13 +35,20 @@ import java.util.Date;
 @Component("traderCore")
 public class TraderCore {
 
+    @Resource
+    private ExDataServiceFactory exServiceFactory;
+
+    @Resource
+    RecordService  recordService;
+
     private final  static SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private final  static SimpleDateFormat fileNameSdf=new SimpleDateFormat("yyyyMMdd");
 
     //the minimum price different rate for bid and ask.
-    private final static double minPriceDiff = 0.008;
-    private final static double minTradableValue = 0.001;
+    private final static double minPriceDiff = 0.006;
+    private final static double minTradableValue = 0.0005;
+    private final static double maxTradableValue = 0.01;
     private final static double exchangeTradeCostRate = 0.002;
 
     // return code:
@@ -81,8 +92,23 @@ public class TraderCore {
         lower_ask_2_qtty = lowerAsks[1].getQuanatity();
 
         //set a temp value for coinBalanceHigher and bcoinBbalanceLower
-        double coinBalanceHigherTemp = 99999;
-        double bcoinBalanceLowerTemp = 99999;
+        double coinBalanceHigherTemp = 9999;
+        double bcoinBalanceLowerTemp = 9999;
+
+
+        IcoAccount highIcoAccount=null;
+        IcoAccount lowIcoAccount=null;
+
+        try {
+            highIcoAccount=   recordService.getUserExAccountData("111",higherEx);
+
+            lowIcoAccount=   recordService.getUserExAccountData("111",lowerEx);
+
+            coinBalanceHigherTemp=highIcoAccount.getIcoValue(icoCpl);
+
+            bcoinBalanceLowerTemp=lowIcoAccount.getIcoValue("btc");
+
+
 
         priceDiff1 = (higher_bid_2_val - lower_ask_2_val)/lower_ask_2_val;
 
@@ -102,11 +128,16 @@ public class TraderCore {
         // in version 1.1, I take the conservative path,
         //    which is to use the smaller number between the 60% volume of 2nd price and the average of 1st and 2nd price.
         //
-        minQttyHigher = Math.min(higher_bid_2_qtty  * 0.6, (higher_bid_1_qtty + higher_bid_2_qtty)/2);
-        minQttyLower = Math.min(lower_ask_2_qtty * 0.6, (lower_ask_1_qtty + lower_ask_2_qtty)/2);
+        minQttyHigher = Math.min(higher_bid_2_qtty  * 999, (higher_bid_1_qtty + higher_bid_2_qtty)/2);
+        minQttyLower = Math.min(lower_ask_2_qtty * 999, (lower_ask_1_qtty + lower_ask_2_qtty)/2);
 
         minTradbleQtty = Math.min(minQttyHigher, minQttyLower);
         minTradbleQtty = Math.min(coinBalanceHigherTemp, minTradbleQtty);
+
+        minTradbleQtty = Math.min(bcoinBalanceLowerTemp/lower_ask_2_val, minTradbleQtty);
+
+        minTradbleQtty = Math.min(maxTradableValue/lower_ask_2_val, minTradbleQtty);
+
 
         //calculate tradable value, which is the minimum tradable quantity * lower_ask_2_val;
         tradeValueBuy = minTradbleQtty * lower_ask_2_val;
@@ -115,7 +146,7 @@ public class TraderCore {
                         "," + lower_ask_1_qtty + "," + lower_ask_2_qtty;
         System.out.println(str1);
 
-        if (tradeValueBuy < minTradableValue ){
+        if (tradeValueBuy < minTradableValue  ){
             String str = "Tradble value too small as : " + minTradbleQtty + " * " + lower_ask_2_val + " =  " + tradeValueBuy ;
             System.out.println(str);
             return 2;
@@ -132,41 +163,117 @@ public class TraderCore {
 
         String str = "WOW! Possible arbitrage of :ico couple is:  "+icoCpl+","+ higherEx +"-->"+lowerEx+"  " + tradeValueMargin + " of base coin !" ;
 
-
-        System.out.println(str);
-
-        StringBuffer csvBuffer=new StringBuffer();
-
-        csvBuffer.append(icoCpl)
-                .append(",").append(sdf.format(new Date()))
-                .append(",").append(higherEx)
-                .append(",").append(lowerEx)
-                .append(",").append(tradeValueMargin)
-                .append(",").append(tradeValueMarginPct)
-                .append(",").append(minTradbleQtty)
-                .append(",").append(tradeValueBuy)
-                .append(",").append(tradeValueSell)
-                .append("\n");
+            System.out.println(str);
 
 
-        String filePath= Config.get("log.dir")+"/output";
-                 File outPut=new File(filePath);
-                 if(!outPut.exists()){
-                     outPut.mkdirs();
-                 }
-        File file=new File(filePath, fileNameSdf.format(new Date())+".csv");
-        try {
-            if(!file.exists()){
-                FileUtils.write(file, "ico couple,date,higherEx,lowerEx,tradeValueMargin,tradeValueMarginPct,minTradbleQtty,tradeValueBuy,tradeValueSell\n", "gb2312", true);
+           Double coinNum= highIcoAccount.getIcoValue(icoCpl);
+
+           Double btcNum=  highIcoAccount.getBtc();
+
+
+           Double coinNumLow= lowIcoAccount.getIcoValue(icoCpl);
+           Double btcNumLow=  lowIcoAccount.getBtc();
+
+            // sell and  minus cost
+            coinNum=coinNum-minTradbleQtty ;
+
+            btcNum=btcNum+minTradbleQtty*higher_bid_2_val - minTradbleQtty*higher_bid_2_val*exchangeTradeCostRate;
+
+            highIcoAccount.setIcoValue(icoCpl,coinNum);
+            highIcoAccount.setBtc(btcNum);
+
+            coinNumLow=coinNumLow+minTradbleQtty;
+            btcNumLow=btcNumLow-minTradbleQtty*lower_ask_2_val- minTradbleQtty*lower_ask_2_val*exchangeTradeCostRate;
+
+            lowIcoAccount.setIcoValue(icoCpl,coinNumLow);
+            lowIcoAccount.setBtc(btcNumLow);
+
+
+
+
+
+
+
+
+            StringBuffer csvBuffer=new StringBuffer();
+
+            csvBuffer.append(icoCpl)
+                    .append(",").append(sdf.format(new Date()))
+                    .append(",").append(higherEx)
+                    .append(",").append(lowerEx)
+                    .append(",").append(tradeValueMargin)
+                    .append(",").append(tradeValueMarginPct)
+                    .append(",").append(minTradbleQtty)
+                    .append(",").append(tradeValueBuy)
+                    .append(",").append(tradeValueSell)
+                    .append("\n");
+
+
+            String filePath= Config.get("log.dir")+"/output";
+            File outPut=new File(filePath);
+            if(!outPut.exists()){
+                outPut.mkdirs();
+            }
+            File file=new File(filePath, fileNameSdf.format(new Date())+".csv");
+            try {
+                if(!file.exists()){
+                    FileUtils.write(file, "ico couple,date,higherEx,lowerEx,tradeValueMargin,tradeValueMarginPct,minTradbleQtty,tradeValueBuy,tradeValueSell\n", "gb2312", true);
+                }
+
+                FileUtils.write(file, csvBuffer.toString(), "gb2312", true);
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
-            FileUtils.write(file, csvBuffer.toString(), "gb2312", true);
+            System.out.println(csvBuffer);
 
-        } catch (IOException e) {
+
+
+            //        try {
+//            DataService higthService = exServiceFactory.getService(higherEx);
+//
+//            System.out.println("\n i sell  at ==>"+higherEx+" :" + icoCpl+","+higher_bid_2_val+","+minTradbleQtty);
+//
+//            JSONObject hightres =
+//                higthService.sell(icoCpl,higher_bid_2_val,minTradbleQtty);
+//
+//
+//            Object result= hightres.get("result");
+//            boolean needBuy=true;
+//            if(result instanceof Boolean){
+//                needBuy=(Boolean)result;
+//            }
+//           else if( result instanceof  String){
+//                needBuy=Boolean.parseBoolean((String)result);
+//            }
+//
+//            if(!needBuy){
+//                System.out.println("sell res are false, not buy anything");
+//                return 4;
+//
+//
+//            }
+//            DataService lowService =  exServiceFactory.getService(lowerEx);
+//
+//            System.out.println("\n i buy  at==>"+lowerEx+":" + icoCpl+","+lower_ask_2_val+","+minTradbleQtty);
+//
+//             JSONObject lowrs= lowService.buy(icoCpl, lower_ask_2_val, minTradbleQtty);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
+
+
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        System.out.println(csvBuffer);
+
+
 
 
         return 1;

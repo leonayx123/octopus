@@ -2,9 +2,12 @@
 <project version="4">
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/src/main/java/com" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/sdyc/core/Business.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/sdyc/core/Core.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/sdyc/core/TraderCore.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/sdyc/core/task/SystemQuartzHandle.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/sdyc/sys/Config.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/com/sdyc/utils/HttpUtilManager.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/sdyc/utils/MD5Util.java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
