@@ -81,6 +81,11 @@ public class ZbServiceImpl  implements DataService{
 
     }
 
+    @Override
+    public String getExchangeCp(String comonCp) {
+        return cpsMap.get(comonCp);
+    }
+
     /**
      * get  price data
      * @param cp  ico couple
@@ -116,7 +121,7 @@ public class ZbServiceImpl  implements DataService{
             }
 
         } catch (Exception e) {
-            throw e;
+            throw new Exception(cp+", get price exception ");
         }
 
 

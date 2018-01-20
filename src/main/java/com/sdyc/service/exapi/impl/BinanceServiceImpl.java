@@ -72,6 +72,17 @@ public class BinanceServiceImpl implements DataService {
     }
 
     /**
+     * 根据公共cp 拿到每一家的cp转换
+     *
+     * @param comonCp
+     * @return
+     */
+    @Override
+    public String getExchangeCp(String comonCp) {
+        return cpsMap.get(comonCp);
+    }
+
+    /**
      * get  price data
      * @param cp  ico couple
      * @return
@@ -103,7 +114,7 @@ public class BinanceServiceImpl implements DataService {
 
 
         } catch (Exception e) {
-            throw e;
+            throw new Exception(cp+",get price exception ");
         }
 
 

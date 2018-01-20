@@ -36,6 +36,13 @@ public interface DataService {
     Map<String,String> getExchangeCpMap();
 
     /**
+     * 根据公共cp 拿到每一家的cp转换
+     * @param comonCp
+     * @return
+     */
+    String getExchangeCp(String comonCp);
+
+    /**
      * get ico couple pirce data
      * @param  cp ico couple name like: btc_dbc
      * @return

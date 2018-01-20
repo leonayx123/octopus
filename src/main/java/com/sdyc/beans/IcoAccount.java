@@ -31,28 +31,28 @@ public class IcoAccount {
     long batchNum;
 
 
-    Double btc;
-    Double eth;
-    Double xrp;
-    Double bch;
-    Double ada;
-    Double ltc;
-    Double xem;
-    Double neo;
-    Double xlm;
-    Double iota;
-    Double eos;
-    Double dash;
-    Double trx;
-    Double xmr;
-    Double btg;
-    Double etc;
-    Double icx;
-    Double lsk;
-    Double qtum;
-    Double xrb;
-    Double omg;
-    Double usdt;
+    Double btc=0.0;
+    Double eth=0.0;
+    Double xrp=0.0;
+    Double bch=0.0;
+    Double ada=0.0;
+    Double ltc=0.0;
+    Double xem=0.0;
+    Double neo=0.0;
+    Double xlm=0.0;
+    Double iota=0.0;
+    Double eos=0.0;
+    Double dash=0.0;
+    Double trx=0.0;
+    Double xmr=0.0;
+    Double btg=0.0;
+    Double etc=0.0;
+    Double icx=0.0;
+    Double lsk=0.0;
+    Double qtum=0.0;
+    Double xrb=0.0;
+    Double omg=0.0;
+    Double usdt=0.0;
 
     Date   groupDate;
     Date   createDate;
@@ -329,7 +329,7 @@ public class IcoAccount {
 
     @Override
     public int hashCode() {
-        return this.userKey.hashCode();
+        return  (userId+exchange) .hashCode();
     }
 
 
@@ -366,5 +366,15 @@ public class IcoAccount {
     }
 
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof IcoAccount){
+            IcoAccount obj1=(IcoAccount)obj;
+            if( obj1.exchange.equals(this.exchange) && obj1.userId.equals(this.userId)){
+                return  true;
+            }
 
+        }
+        return false;
+    }
 }

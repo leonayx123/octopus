@@ -30,7 +30,7 @@ public class RecordServiceImpl implements RecordService {
 
     private static   List<IcoAccount>  accs=null;
 
-    public static  Double allbtcCount=0.0;
+    public static  Double allbtcCount= 1.235373182;
 
     public static Double lastBtcCount=0.0;
 
@@ -142,7 +142,6 @@ public class RecordServiceImpl implements RecordService {
                 ico.setBatchNum(1);
                 ico.setUserKey("111");
                 ico.setCreateDate(dt);
-                allbtcCount=allbtcCount+ico.getBtc();
             }
 
 

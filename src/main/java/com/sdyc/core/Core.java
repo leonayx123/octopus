@@ -21,6 +21,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class Core {
     private static ApplicationContext ctx=null;
 
+    /**
+     * 全局变量
+     *
+     */
+    //全部全部btc的总量
+    public  static double AllbtcNum=  12.35373182;
 
 
     public static   void  run(){

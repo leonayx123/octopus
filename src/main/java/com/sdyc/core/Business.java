@@ -129,7 +129,7 @@ public class Business  {
                  double bili= Math.abs ((highPrice - lowPrice)/Math.min(highPrice,lowPrice)) * 100;
 
                  //if the difference price  lower than 2, do nothing  and continue
-                 if(bili<1){
+                 if(bili<0.8){
                      //System.out.println(gprice+"percent too low . continue");
                      continue;
                  }
@@ -190,7 +190,7 @@ public class Business  {
             File walletLog=new File(logdir+"/output/wallet.csv");
 
             if(!btcLog.exists()){
-                FileUtils.write(btcLog,"date,init btc, current btc , percent%\n","gb2312");
+                FileUtils.write(btcLog,"date ,all btc,exchange btc, current btc , percent\n","gb2312");
 
             }
 
@@ -246,7 +246,7 @@ public class Business  {
 
             //当前值和上次值不相同 才需要写文件
             if( btc[1]!=btc[2]){
-                String btcstr=sdf.format(new Date())+","+btc[0]+","+btc[1]+","+( (btc[1]-btc[0])/btc[1]*100)+"%\n";
+                String btcstr=sdf.format(new Date())+","+Core.AllbtcNum+","+btc[0]+","+btc[1]+","+( (btc[1]-btc[0])/Core.AllbtcNum)+"\n";
                 FileUtils.write(btcLog,btcstr,"gb2312",true);
                 System.out.print(btcstr);
 

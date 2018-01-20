@@ -59,6 +59,7 @@ public class TraderCore {
     // 4 : sell failed;
     // 5 : buy failed;
     public  int  doTrade(Depth[] higherBids, Depth[] lowerAsks, double coinBalanceHigher, double bcoinBalanceLower,String icoCpl,String higherEx,String lowerEx){
+        String filePath= Config.get("log.dir")+"/output";
 
         double higher_bid_1_val;
         double higher_bid_1_qtty;
@@ -79,6 +80,8 @@ public class TraderCore {
 
         double minQttyHigher;
         double minQttyLower;
+        
+        String strTxtFile = higherEx+"====>"+lowerEx+" coin:"+icoCpl+  "********************************* \n";
 
 
         higher_bid_1_val = higherBids[0].getPrice();
@@ -113,8 +116,10 @@ public class TraderCore {
         priceDiff1 = (higher_bid_2_val - lower_ask_2_val)/lower_ask_2_val;
 
         if(priceDiff1 < minPriceDiff){
-            String str = " price gap too small as bid 2 :" + higher_bid_2_val+" ("+higher_bid_1_val+") " + " and ask 2: " + lower_ask_2_val+" ("+lower_ask_1_val+")";
+            String str = " price gap too small "+ priceDiff1 * 100 + "%, by" +" bid 2 :" + higher_bid_2_val+" ( bid1 "+higher_bid_1_val+") " + " and ask 2: " + lower_ask_2_val+" ( ask1 "+lower_ask_1_val+")\n";
+            strTxtFile = strTxtFile + str;
             System.out.println(str);
+            FileUtils.write(new File(filePath+"/log.txt"),strTxtFile,true);
             return 0;
         }
 
@@ -128,10 +133,12 @@ public class TraderCore {
         // in version 1.1, I take the conservative path,
         //    which is to use the smaller number between the 60% volume of 2nd price and the average of 1st and 2nd price.
         //
-        minQttyHigher = Math.min(higher_bid_2_qtty  * 999, (higher_bid_1_qtty + higher_bid_2_qtty)/2);
-        minQttyLower = Math.min(lower_ask_2_qtty * 999, (lower_ask_1_qtty + lower_ask_2_qtty)/2);
+        minQttyHigher = (higher_bid_1_qtty + higher_bid_2_qtty)/2;
+        minQttyLower =  (lower_ask_1_qtty + lower_ask_2_qtty)/2;
 
         minTradbleQtty = Math.min(minQttyHigher, minQttyLower);
+        
+        //select the smaller one, either the minTradbleQtty, or the balance amount of the coin of the higher exchange. 
         minTradbleQtty = Math.min(coinBalanceHigherTemp, minTradbleQtty);
 
         minTradbleQtty = Math.min(bcoinBalanceLowerTemp/lower_ask_2_val, minTradbleQtty);
@@ -142,13 +149,21 @@ public class TraderCore {
         //calculate tradable value, which is the minimum tradable quantity * lower_ask_2_val;
         tradeValueBuy = minTradbleQtty * lower_ask_2_val;
         tradeValueSell = minTradbleQtty * higher_bid_2_val;
-        String str1 = "minimum quantity selection :" + higher_bid_1_qtty + "," + higher_bid_2_qtty +
-                        "," + lower_ask_1_qtty + "," + lower_ask_2_qtty;
+        String str1 = "minimum quantity selection : minQttyHigher: " + minQttyHigher + ", minQttyLower: " + minQttyLower +
+                        ", coinBalanceHigher: " + coinBalanceHigherTemp + ", maxBuyCoinLower: " + bcoinBalanceLowerTemp/lower_ask_2_val + 
+                        ", maxTradeValueCoin: " +maxTradableValue/lower_ask_2_val + " . \n" ;
         System.out.println(str1);
+        strTxtFile = strTxtFile + str1;
+
+
 
         if (tradeValueBuy < minTradableValue  ){
-            String str = "Tradble value too small as : " + minTradbleQtty + " * " + lower_ask_2_val + " =  " + tradeValueBuy ;
+            String str = " , Tradble value too small as : " + tradeValueBuy + " <  " + minTradableValue + "\n" ;
             System.out.println(str);
+            strTxtFile = strTxtFile + str;
+
+
+            FileUtils.write(new File(filePath+"/log.txt"),strTxtFile,true);
             return 2;
         }
 
@@ -161,10 +176,14 @@ public class TraderCore {
         tradeValueMarginPct = tradeValueMargin / tradeValueBuy;
       //  tradeValueMarginPct = Math.round(tradeValueMarginPct);
 
-        String str = "WOW! Possible arbitrage of :ico couple is:  "+icoCpl+","+ higherEx +"-->"+lowerEx+"  " + tradeValueMargin + " of base coin !" ;
+        String str = "WOW! Possible arbitrage :  "+icoCpl+","+ higherEx +"-->"+lowerEx+"  " + tradeValueMargin + " of selling " + tradeValueSell + " and buying "+ tradeValueBuy +"  of base coin !\n" ;
 
             System.out.println(str);
+            strTxtFile = strTxtFile + str;
 
+
+           FileUtils.write(new File(filePath+"/log.txt"),strTxtFile,true);
+            
 
            Double coinNum= highIcoAccount.getIcoValue(icoCpl);
 
@@ -209,7 +228,7 @@ public class TraderCore {
                     .append("\n");
 
 
-            String filePath= Config.get("log.dir")+"/output";
+
             File outPut=new File(filePath);
             if(!outPut.exists()){
                 outPut.mkdirs();
