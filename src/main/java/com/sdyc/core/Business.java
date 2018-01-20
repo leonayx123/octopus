@@ -3,17 +3,20 @@ package com.sdyc.core;
 import com.sdyc.beans.Depth;
 import com.sdyc.beans.IcoAccount;
 import com.sdyc.beans.PriceBean;
-import com.sdyc.dto.TUserBtcDTO;
+import com.sdyc.dto.AccUserBtcDTO;
+import com.sdyc.dto.AccUserExSetingDTO;
 import com.sdyc.service.exapi.DataService;
 import com.sdyc.service.exapi.ExDataServiceFactory;
 import com.sdyc.service.record.RecordService;
+import com.sdyc.service.wallet.CmdAdjustService;
 import com.sdyc.service.wallet.WalletService;
-import com.sdyc.sys.Config;
-import org.apache.commons.io.FileUtils;
+import junit.framework.Assert;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.File;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -32,6 +35,7 @@ import java.util.*;
  */
 @Component("business")
 public class Business  {
+    Log log = LogFactory.getLog(Business.class);
 
 
     @Resource
@@ -46,17 +50,14 @@ public class Business  {
     @Resource
     WalletService walletService;
 
+    @Resource
+    CmdAdjustService cmdAdjustService;
+
 
 
 
 
     //所有需要判断的交易对
-    private final  static  String[] cps=Config.get("icos.cps").split(",");
-
-    private final  static  String[] exNames=Config.get("business.allEx").split(",");
-
-
-
     private final  static SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private final  static SimpleDateFormat fileNameSdf=new SimpleDateFormat("yyyyMMdd");
@@ -68,30 +69,49 @@ public class Business  {
 
         String userId="1mil10coins";
 
-        List<IcoAccount>  accounts=null;
+
+
+
+        AccUserExSetingDTO userExSetingDTO=null;
+        BuniessDataContext context=null;
+        try {
+            //开始调用 币数修改任务.进行币数调整
+            cmdAdjustService.doAllCmds();
+
+
+            //获取最新的钱包信息
+            List<IcoAccount>  accounts = walletService.getAccount(userId);
+
+            context=new BuniessDataContext(accounts);
+
+            //查询用户的btc信息
+            userExSetingDTO= walletService.getUserExSetting(userId);
+
+            Assert.assertNotNull(userExSetingDTO);
+            Assert.assertNotNull(userExSetingDTO.getUserCoins());
+            Assert.assertNotNull(userExSetingDTO.getUserExchanges());
+
+
+        } catch (Exception e) {
+
+            log.error("钱包数据初始化出错",e);
+            return;
+        }
+        //取到用户关注的 币对
+        String[]cps=userExSetingDTO.getUserCoins().split(",");
+        String[] exchanges=userExSetingDTO.getUserExchanges().split(",");
+
 
         for(int i=0;i<cps.length;i++){
-
-
-            try {
-                accounts=  recordService.getAccountData(userId, true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
             String cp=cps[i];
-
              try {
                  ArrayList<PriceBean> priceBeans =new ArrayList<PriceBean>();
-
-
 
                  //the date-time  at beginning
                 String dateStr= sdf.format(new Date());
 
                  //遍历所有的交易所名称. 按名称找到交易所的数据服务类. 调用接口
-                 for(String exName:exNames){
+                 for(String exName:exchanges){
 
                      DataService exDataService=exServiceFactory.getService(exName);
 
@@ -102,8 +122,6 @@ public class Business  {
 
 
                  }
-
-
 
                  //the date-time  at end
                 String endDateStr= sdf.format(new Date());
@@ -160,34 +178,13 @@ public class Business  {
                  if(higherBids==null||higherBids==null){
                      continue;
                  }
-                 System.out.println(cp);
 
-                 traderCore.doTrade(higherBids,lowerAsks,0,0,cp ,higherEx,lowerEx);
-
-
-
-//                 StringBuffer csvBuffer=new StringBuffer()
-//                         .append("name:"+gateCp).append(",,,,\n")
-//                         .append(dateStr).append(",")
-//                         .append(endDateStr).append(",")
-//                         .append(nf.format(gprice)).append(",")
-//                         .append(nf.format(bprice)).append(",")
-//                         .append(nf.format(bili)+"%").append("\n");
-//
-//                 String filePath=  this.getClass().getResource("/").getPath()+"/output";
-//                 File outPut=new File(filePath);
-//                 if(!outPut.exists()){
-//                     outPut.mkdirs();
-//                 }
-                // File file=new File(filePath, fileNameSdf.format(new Date())+".csv");
-                // FileUtils.write(file,csvBuffer.toString(),"gb2312",true);
-
-                // System.out.println(csvBuffer);
-
+                 //传入context. 数据修改都在Contex里操作
+                 traderCore.doTrade(context,higherBids,lowerAsks,0,0,cp ,higherEx,lowerEx);
 
 
              } catch (Exception e) {
-                 e.printStackTrace();
+                 log.error("traderCore 调用捕获到异常");
                  continue;
              }
 
@@ -195,122 +192,48 @@ public class Business  {
 
         try {
 
+            List <IcoAccount > contextAccs= context.getContextIcoAccountDatas();
+            walletService.batchUpdateUserCoinAmt(userId,cps,contextAccs);
 
-            String[] cpls="btc,eth,xrp,bch,ada,ltc,xem,xlm,neo,iota".split(",");
-
-            for(IcoAccount iass :accounts){
-
-                for(String cp:cpls){
-                    walletService.updateUserCoinAmt(userId,iass.getExchange(), cp,iass.getIcoValue(cp));
-                }
-            }
-
-
-            String logdir= Config.get("log.dir");
-            File btcLog= new File(logdir+"/output/btclog.csv");
-            File walletLog=new File(logdir+"/output/wallet.csv");
-
-            if(!btcLog.exists()){
-                FileUtils.write(btcLog,"date ,all btc,exchange btc, current btc , percent\n","gb2312");
-
-            }
-
-            //FileUtils.forceDeleteOnExit(walletLog);
-
-
-
-            StringBuffer walletBf=new StringBuffer();
             Double currBtc=0.0;
-            Date dt =new Date();
-
-
-            walletBf.
-                     append("exchange")
-                    .append(",").append("btc")
-                    .append(",").append("eth")
-                    .append(",").append("xrp")
-                    .append(",").append("bch")
-                    .append(",").append("ada")
-                    .append(",").append("ltc")
-                    .append(",").append("xem")
-                    .append(",").append("neo")
-                    .append(",").append("xlm")
-                    .append(",").append("iota")
-                    .append(",").append("eos")
-                    .append(",").append("dash")
-                    .append(",").append("trx")
-                    .append(",").append("xmr")
-                    .append(",").append("btg")
-                    .append(",").append("etc")
-                    .append(",").append("icx")
-                    .append(",").append("lsk")
-                    .append(",").append("qtum")
-                    .append(",").append("xrb")
-                    .append(",").append("omg")
-                    .append(",").append("usdt")
-                    .append(",").append("createDate")
-                    .append(",").append("updateDate")
-                    .append("\n");
-
-            for(IcoAccount  account: accounts){
-                account.setUpdateDate(dt);
-
-                walletBf.append(account.toString()).append("\n");
+            for(IcoAccount  account: contextAccs){
                 currBtc=currBtc+account.getBtc();
+            }
 
-             }
+            AccUserBtcDTO btc=walletService.getUserBtc(userId);
 
+            //当前值不等于 上次的btc值 才需要做记录 说明增加了.
+            //如果是减少..那说明出bug了
+            if(btc.getCurrBtc().doubleValue()<currBtc){
+                //Core.lastBtc =btc.getCurrBtc().doubleValue();
+                Double ratio=(currBtc - btc.getInitBtc().doubleValue())/ btc.getInvestBtc().doubleValue();
+                AccUserBtcDTO btcup=new AccUserBtcDTO();
 
-            TUserBtcDTO btc=recordService.getBtcChange();
-            //Core.lastBtc =btc.getCurrBtc().doubleValue();
-
-            Double pc=(currBtc - btc.getInitBtc().doubleValue())/ btc.getInvestBtc().doubleValue();
-
-
-            walletService.updateUserBtc(userId,currBtc,"currBtc");
-
-            walletService.updateUserBtc(userId,pc,"persent");
-
-            System.out.print("****************wallet********************\n");
-
-//            //当前值和上次值不相同 才需要写文件
-//            if( btc.getCurrBtc()!=btc.getInitBtc()){
-//
-//
-//
-//                String btcstr=sdf.format(new Date())+","+Core.AllbtcNum+","+btc[0]+","+btc[1]+","+( (btc[1]-btc[0])/Core.AllbtcNum)+"\n";
-//                FileUtils.write(btcLog,btcstr,"gb2312",true);
-//                System.out.print(btcstr);
-//
-//
-//                FileUtils.write(walletLog,walletBf.toString(),"gb2312",false);
-//
-//                System.out.print(walletBf.toString());
-//            }
+                btcup.setCurrBtc(new BigDecimal(currBtc));
+                btcup.setAddRatio(ratio);
+                btcup.setUserId(userId);
+                //修改btc变化数据
+                walletService.updateUserBtc(btcup);
 
 
 
+            }else if(btc.getCurrBtc().doubleValue()>currBtc) {
+                log.error("WTF !!! curr btc 居然减少了,下面是当前详情!!====> "+currBtc);
+                for(IcoAccount  account: contextAccs){
+                    log.error(account.toString());
+                }
 
+            }else {
+                log.debug("当前btc 和 上次btc相同 不做记录了 ");
+            }
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+           log.error("写buniess日志时出错",e);
         }
 
 
     }
 
 
-
-
-    //this method  for  test
-    public void  doTest(){
-        try {
-
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

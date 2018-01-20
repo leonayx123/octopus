@@ -24,8 +24,6 @@ public class IcoAccount {
 
     String userId;
 
-    String userKey;
-
     String exchange;
 
     long batchNum;
@@ -118,13 +116,7 @@ public class IcoAccount {
         this.userId = userId;
     }
 
-    public String getUserKey() {
-        return userKey;
-    }
 
-    public void setUserKey(String userKey) {
-        this.userKey = userKey;
-    }
 
     public String getExchange() {
         return exchange;
@@ -337,7 +329,8 @@ public class IcoAccount {
     public String toString() {
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         StringBuffer sb=new StringBuffer()
-         .append(exchange)
+        .append(userId).append(",")
+        .append(exchange)
         .append(",").append(btc)
         .append(",").append(eth)
         .append(",").append(xrp)
@@ -359,9 +352,8 @@ public class IcoAccount {
         .append(",").append(qtum)
         .append(",").append(xrb)
         .append(",").append(omg)
-        .append(",").append(usdt)
-        .append(",").append(sdf.format(createDate))
-        .append(",").append(sdf.format(updateDate));
+        .append(",").append(usdt);
+
         return sb.toString();
     }
 

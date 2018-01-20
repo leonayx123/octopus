@@ -58,7 +58,7 @@ public class TraderCore {
     // 3 : not enough bcoin on lower
     // 4 : sell failed;
     // 5 : buy failed;
-    public  int  doTrade(Depth[] higherBids, Depth[] lowerAsks, double coinBalanceHigher, double bcoinBalanceLower,String icoCpl,String higherEx,String lowerEx){
+    public  int  doTrade(BuniessDataContext context, Depth[] higherBids, Depth[] lowerAsks, double coinBalanceHigher, double bcoinBalanceLower,String icoCpl,String higherEx,String lowerEx){
         String filePath= Config.get("log.dir")+"/output";
 
         double higher_bid_1_val;
@@ -103,9 +103,9 @@ public class TraderCore {
         IcoAccount lowIcoAccount=null;
 
         try {
-            highIcoAccount=   recordService.getUserExAccountData(Core.userId,higherEx);
+            highIcoAccount=   context.getUserExAccountData(higherEx);
 
-            lowIcoAccount=   recordService.getUserExAccountData(Core.userId,lowerEx);
+            lowIcoAccount=   context.getUserExAccountData(lowerEx);
 
             coinBalanceHigherTemp=highIcoAccount.getIcoValue(icoCpl);
 

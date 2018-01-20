@@ -30,7 +30,7 @@ public class WalletInitTest {
     @Test
     public void testInitWallet() throws Exception {
         Double btcnum= 11.23608;
-        String[] exs=new String[]{"okex","gateIo","binance","huobipro","zb"};
+        String[] exs="okex,gateIo,binance,huobipro,zb".split(",");
         String[]iconCps="btc,eth,xrp,bch,ada,ltc,xem,xlm,neo,iota".split(",");
 
 

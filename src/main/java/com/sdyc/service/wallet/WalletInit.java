@@ -41,10 +41,14 @@ public class WalletInit {
 
             TreeMap<String,IcoAccount> accMap= initWallet( btcNum,exchanes,iconCpls );
 
+            //先清除历史数据
             walletService.deleteUserDate(userId);
 
-            ArrayList<IcoAccount> accs=new ArrayList<IcoAccount>();
 
+            walletService.addUserExSetting(userId, StringUtils.join(iconCpls,",")  , StringUtils.join(exchanes,","));
+
+
+            ArrayList<IcoAccount> accs=new ArrayList<IcoAccount>();
             Double btc=0.0;
             for(String ex:exchanes){
                 IcoAccount icoAccount=  accMap.get(ex);
