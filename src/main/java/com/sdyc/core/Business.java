@@ -3,16 +3,17 @@ package com.sdyc.core;
 import com.sdyc.beans.Depth;
 import com.sdyc.beans.IcoAccount;
 import com.sdyc.beans.PriceBean;
+import com.sdyc.dto.TUserBtcDTO;
 import com.sdyc.service.exapi.DataService;
 import com.sdyc.service.exapi.ExDataServiceFactory;
 import com.sdyc.service.record.RecordService;
+import com.sdyc.service.wallet.WalletService;
 import com.sdyc.sys.Config;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -42,6 +43,11 @@ public class Business  {
     @Resource
     RecordService recordService;
 
+    @Resource
+    WalletService walletService;
+
+
+
 
 
     //所有需要判断的交易对
@@ -60,17 +66,21 @@ public class Business  {
     //实际工作的业务逻辑
     public void  doWork(){
 
-        List<IcoAccount>  accounts=null;
+        String userId="1mil10coins";
 
-        try {
-            accounts= recordService.getAccountData("111");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        List<IcoAccount>  accounts=null;
 
         for(int i=0;i<cps.length;i++){
 
-             String cp=cps[i];
+
+            try {
+                accounts=  recordService.getAccountData(userId, true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            String cp=cps[i];
 
              try {
                  ArrayList<PriceBean> priceBeans =new ArrayList<PriceBean>();
@@ -185,6 +195,17 @@ public class Business  {
 
         try {
 
+
+            String[] cpls="btc,eth,xrp,bch,ada,ltc,xem,xlm,neo,iota".split(",");
+
+            for(IcoAccount iass :accounts){
+
+                for(String cp:cpls){
+                    walletService.updateUserCoinAmt(userId,iass.getExchange(), cp,iass.getIcoValue(cp));
+                }
+            }
+
+
             String logdir= Config.get("log.dir");
             File btcLog= new File(logdir+"/output/btclog.csv");
             File walletLog=new File(logdir+"/output/wallet.csv");
@@ -238,30 +259,41 @@ public class Business  {
                 currBtc=currBtc+account.getBtc();
 
              }
-            recordService.setCurrBtc(currBtc);
 
-            double[] btc=recordService.getBtcChange();
+
+            TUserBtcDTO btc=recordService.getBtcChange();
+            //Core.lastBtc =btc.getCurrBtc().doubleValue();
+
+            Double pc=(currBtc - btc.getInitBtc().doubleValue())/ btc.getInvestBtc().doubleValue();
+
+
+            walletService.updateUserBtc(userId,currBtc,"currBtc");
+
+            walletService.updateUserBtc(userId,pc,"persent");
 
             System.out.print("****************wallet********************\n");
 
-            //当前值和上次值不相同 才需要写文件
-            if( btc[1]!=btc[2]){
-                String btcstr=sdf.format(new Date())+","+Core.AllbtcNum+","+btc[0]+","+btc[1]+","+( (btc[1]-btc[0])/Core.AllbtcNum)+"\n";
-                FileUtils.write(btcLog,btcstr,"gb2312",true);
-                System.out.print(btcstr);
+//            //当前值和上次值不相同 才需要写文件
+//            if( btc.getCurrBtc()!=btc.getInitBtc()){
+//
+//
+//
+//                String btcstr=sdf.format(new Date())+","+Core.AllbtcNum+","+btc[0]+","+btc[1]+","+( (btc[1]-btc[0])/Core.AllbtcNum)+"\n";
+//                FileUtils.write(btcLog,btcstr,"gb2312",true);
+//                System.out.print(btcstr);
+//
+//
+//                FileUtils.write(walletLog,walletBf.toString(),"gb2312",false);
+//
+//                System.out.print(walletBf.toString());
+//            }
 
 
-                FileUtils.write(walletLog,walletBf.toString(),"gb2312",false);
-
-                System.out.print(walletBf.toString());
-            }
 
 
 
 
-
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

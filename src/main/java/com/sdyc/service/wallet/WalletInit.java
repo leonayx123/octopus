@@ -31,6 +31,38 @@ public class WalletInit {
     @Resource
     ExDataServiceFactory factory;
 
+    @Resource
+    WalletService walletService;
+
+
+    public void  doInit(String userId, Double btcNum,String[] exchanes,String[] iconCpls ){
+        try {
+
+
+            TreeMap<String,IcoAccount> accMap= initWallet( btcNum,exchanes,iconCpls );
+
+            walletService.deleteUserDate(userId);
+
+            ArrayList<IcoAccount> accs=new ArrayList<IcoAccount>();
+
+            Double btc=0.0;
+            for(String ex:exchanes){
+                IcoAccount icoAccount=  accMap.get(ex);
+                icoAccount.setUserId(userId);
+                btc=btc+icoAccount.getBtc();
+                accs.add(icoAccount);
+            }
+
+            walletService.addUserExData(accs,iconCpls);
+
+            walletService.addUserBtc(userId,btcNum,btc,btc);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
     /**
      * 初始化钱包数据.  根据传入的
      * @param btcNum

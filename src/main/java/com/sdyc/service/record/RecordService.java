@@ -2,6 +2,7 @@ package com.sdyc.service.record;
 
 import com.sdyc.beans.IcoAccount;
 import com.sdyc.beans.TradeRecordBean;
+import com.sdyc.dto.TUserBtcDTO;
 
 import java.util.List;
 
@@ -22,9 +23,8 @@ import java.util.List;
 
 public interface RecordService {
 
-    public double[] getBtcChange();
+    public TUserBtcDTO getBtcChange();
 
-    public void setCurrBtc(double btc);
 
 
     /**
@@ -32,7 +32,7 @@ public interface RecordService {
      * @param
      * @return
      */
-    public List<IcoAccount>  getAccountData(String userId)throws Exception;
+    public List<IcoAccount>  getAccountData(String userId,Boolean reload)throws Exception;
 
 
     /**

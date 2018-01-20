@@ -13,7 +13,6 @@
 	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
 	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 	http://www.springframework.org/schema/task
     http://www.springframework.org/schema/task/spring-task.xsd">
@@ -33,6 +32,33 @@
         </property>
     </bean>
     <util:properties id="settings" location="classpath:config.properties"></util:properties>
+
+
+    <bean lazy-init="true" id="dataSource"
+          class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close"
+          scope="singleton">
+        <property name="user" value="${jdbc.user}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+        <property name="jdbcUrl" value="${jdbc.url}"></property>
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="maxPoolSize" value="30"></property>
+        <property name="initialPoolSize" value="2"></property>
+        <property name="maxIdleTime" value="14400"></property>
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" >
+        <constructor-arg index="0" ref="dataSource" />
+    </bean>
+
+
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+        <qualifier value="transactionManager"></qualifier>
+    </bean>
+    <!--注解方式实现事务-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
 
 
 

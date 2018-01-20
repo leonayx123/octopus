@@ -103,9 +103,9 @@ public class TraderCore {
         IcoAccount lowIcoAccount=null;
 
         try {
-            highIcoAccount=   recordService.getUserExAccountData("111",higherEx);
+            highIcoAccount=   recordService.getUserExAccountData(Core.userId,higherEx);
 
-            lowIcoAccount=   recordService.getUserExAccountData("111",lowerEx);
+            lowIcoAccount=   recordService.getUserExAccountData(Core.userId,lowerEx);
 
             coinBalanceHigherTemp=highIcoAccount.getIcoValue(icoCpl);
 

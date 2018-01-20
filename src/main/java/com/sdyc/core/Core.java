@@ -28,6 +28,10 @@ public class Core {
     //全部全部btc的总量
     public  static double AllbtcNum=  12.35373182;
 
+    public   static  Double lastBtc=0.0;
+
+    public static  String userId= "1mil10coins";
+
 
     public static   void  run(){
 

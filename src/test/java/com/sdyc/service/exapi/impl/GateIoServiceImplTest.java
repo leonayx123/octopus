@@ -71,6 +71,8 @@ public class GateIoServiceImplTest extends TestBaseSetupService {
     @Test
     public void testGetBalances() throws Exception {
 
+        getTestService().getBalances();
+
     }
 
     @Test

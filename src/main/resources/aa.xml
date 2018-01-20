@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="com.sdyc.dto.AccCoinBalanceDTO" table="acc_coin_balance" schema="" catalog="btcfactory">
+        <id name="guid" column="guid"/>
+        <property name="userId" column="userId"/>
+        <property name="exchangeId" column="exchangeId"/>
+        <property name="coinId" column="coinId"/>
+        <property name="coinAmt" column="coinAmt"/>
+        <property name="createDate" column="createDate"/>
+        <property name="updateDate" column="updateDate"/>
+        <property name="isActive" column="isActive"/>
+    </class>
+    <class name="com.sdyc.dto.AccExcoinSpotDTO" table="acc_excoin_spot" schema="" catalog="btcfactory">
+        <id name="seqkey" column="seqkey"/>
+        <property name="userId" column="userId"/>
+        <property name="exchaneId" column="exchaneId"/>
+        <property name="batchNum" column="batchNum"/>
+        <property name="groupDate" column="groupDate"/>
+        <property name="createDate" column="createDate"/>
+        <property name="updateDate" column="updateDate"/>
+        <property name="coinInfo" column="coinInfo"/>
+    </class>
+    <class name="com.sdyc.dto.AccUserDTO" table="acc_user" schema="" catalog="btcfactory">
+        <id name="userId" column="userId"/>
+        <property name="userName" column="userName"/>
+        <property name="loginName" column="loginName"/>
+        <property name="password" column="password"/>
+        <property name="phone" column="phone"/>
+        <property name="address" column="address"/>
+        <property name="isActive" column="isActive"/>
+    </class>
+    <class name="com.sdyc.dto.AccUserExchangeDTO" table="acc_user_exchange" schema="" catalog="btcfactory">
+        <id name="guid" column="guid"/>
+        <property name="userId" column="userId"/>
+        <property name="exchangeId" column="exchangeId"/>
+        <property name="createDate" column="createDate"/>
+        <property name="isActive" column="isActive"/>
+    </class>
+    <class name="com.sdyc.dto.CmdBalanceAdjustDTO" table="cmd_balance_adjust" schema="" catalog="btcfactory">
+        <id name="seqkey" column="seqkey"/>
+        <property name="userId" column="userId"/>
+        <property name="exchangeId" column="exchangeId"/>
+        <property name="coinId" column="coinId"/>
+        <property name="amtChange" column="amtChange"/>
+        <property name="status" column="status"/>
+        <property name="adjustSetTime" column="adjust_set_time"/>
+        <property name="adjustTime" column="adjust_time"/>
+    </class>
+    <class name="com.sdyc.dto.TUserBtcDTO" table="t_user_btc" schema="" catalog="btcfactory">
+        <id name="userId" column="userId"/>
+        <property name="investBtc" column="investBtc"/>
+        <property name="initBtc" column="initBtc"/>
+        <property name="currBtc" column="currBtc"/>
+        <property name="updateDate" column="updateDate"/>
+    </class>
+</hibernate-mapping>
