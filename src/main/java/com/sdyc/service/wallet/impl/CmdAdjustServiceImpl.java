@@ -34,7 +34,7 @@ public class CmdAdjustServiceImpl implements CmdAdjustService {
 
 
     /**
-     * ÕâÀïÊÇÖ´ĞĞÈÎÎñµÄÖ÷Èë¿Ú
+     * è¿™é‡Œæ˜¯æ‰§è¡Œä»»åŠ¡çš„ä¸»å…¥å£
      * @return
      */
     public  boolean doAllCmds(){
@@ -46,8 +46,8 @@ public class CmdAdjustServiceImpl implements CmdAdjustService {
             }
             catch (Exception e){
 
-                log.error("CMD_ADJUST Ö´ĞĞ³ö´í..seqkey is:"+ cmd.getSeqkey(), e);
-                //³öÏÖÒì³£»Ø¹öºó.°Ñ×´Ì¬ Ğ´³ÉFAIL.
+                log.error("CMD_ADJUST æ‰§è¡Œå‡ºé”™..seqkey is:"+ cmd.getSeqkey(), e);
+                //å‡ºç°å¼‚å¸¸å›æ»šå.æŠŠçŠ¶æ€ å†™æˆFAIL.
                 cmd.setStatus("FAIL");
                 this.changeStatusForAdjust(cmd);
             }
@@ -57,7 +57,7 @@ public class CmdAdjustServiceImpl implements CmdAdjustService {
         return  true;
     }
     /**
-     * Ö´ĞĞÃüÁî
+     * æ‰§è¡Œå‘½ä»¤
      *
      * @return
      */
@@ -65,22 +65,22 @@ public class CmdAdjustServiceImpl implements CmdAdjustService {
     @Transactional
     public boolean DoCmdAdjust(CmdBalanceAdjustDTO cmd)throws Exception{
 
-         //»ñÈ¡Õâ¸öÈÎÎñ¶ÔÓ¦µÄÕËºÅÊı¾İ
+        //è·å–è¿™ä¸ªä»»åŠ¡å¯¹åº”çš„è´¦å·æ•°æ®
         IcoAccount account=  walletService.getExAccount(cmd.getUserId(), cmd.getExchangeId());
 
-         //¶ÔÔ­À´µÄÊı¾İ¼ÓÉÏÉèÖÃµÄÊı¾İ»ñµÃ×îĞÂµÄÊı¾İ
-         Double newAmt=account.getIcoValue(cmd.getCoinId());
-         newAmt=newAmt+cmd.getAmtChange().doubleValue();
+        //å¯¹åŸæ¥çš„æ•°æ®åŠ ä¸Šè®¾ç½®çš„æ•°æ®è·å¾—æœ€æ–°çš„æ•°æ®
+        Double newAmt=account.getIcoValue(cmd.getCoinId());
+        newAmt=newAmt+cmd.getAmtChange().doubleValue();
 
-         //Ö´ĞĞÈÎÎñ
-         walletService.updateUserCoinAmt(
-                 cmd.getUserId(),
-                 cmd.getExchangeId(),
-                 cmd.getCoinId(),
-                 newAmt
-              );
+        //æ‰§è¡Œä»»åŠ¡
+        walletService.updateUserCoinAmt(
+                cmd.getUserId(),
+                cmd.getExchangeId(),
+                cmd.getCoinId(),
+                newAmt
+        );
 
-        //Ö´ĞĞ³É¹¦µÄ»° ÉèÖÃ×´Ì¬ÎªSUCCESS
+        //æ‰§è¡ŒæˆåŠŸçš„è¯ è®¾ç½®çŠ¶æ€ä¸ºSUCCESS
         cmd.setStatus("SUCCESS");
         this.changeStatusForAdjust(cmd);
 
@@ -88,7 +88,7 @@ public class CmdAdjustServiceImpl implements CmdAdjustService {
     }
 
     /**
-     * »ñÈ¡ËùÓĞ´ú°ìÃüÁîÁĞ±í
+     * è·å–æ‰€æœ‰ä»£åŠå‘½ä»¤åˆ—è¡¨
      *
      * @return
      */
@@ -96,14 +96,14 @@ public class CmdAdjustServiceImpl implements CmdAdjustService {
     public List<CmdBalanceAdjustDTO> getAllBalanceAdjust() {
         String sql="select * from cmd_balance_adjust where adjust_set_time <=? and status='TODO' ";
 
-      List<CmdBalanceAdjustDTO>  cmds= jdbcTemplate.query(sql, new Object[]{new Date()},
+        List<CmdBalanceAdjustDTO>  cmds= jdbcTemplate.query(sql, new Object[]{new Date()},
                 new BeanPropertyRowMapper<CmdBalanceAdjustDTO>(CmdBalanceAdjustDTO.class));
 
         return cmds;
     }
 
     /**
-     * Ö´ĞĞËùÓĞÃüÁî,ĞŞ¸Ä×´Ì¬
+     * æ‰§è¡Œæ‰€æœ‰å‘½ä»¤,ä¿®æ”¹çŠ¶æ€
      *
      * @param
      */

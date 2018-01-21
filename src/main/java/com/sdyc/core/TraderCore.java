@@ -141,7 +141,7 @@ public class TraderCore {
         //select the smaller one, either the minTradbleQtty, or the balance amount of the coin of the higher exchange. 
         minTradbleQtty = Math.min(coinBalanceHigherTemp, minTradbleQtty);
 
-        minTradbleQtty = Math.min(bcoinBalanceLowerTemp/lower_ask_2_val, minTradbleQtty);
+        minTradbleQtty = Math.min(bcoinBalanceLowerTemp*(1-exchangeTradeCostRate)/lower_ask_2_val, minTradbleQtty);
 
         minTradbleQtty = Math.min(maxTradableValue/lower_ask_2_val, minTradbleQtty);
 

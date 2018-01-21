@@ -220,7 +220,7 @@ public class Business  {
 
                 String btcLog= Config.get("log.dir")+"/output/btclog.csv";
 
-                String btcstr=sdf.format(new Date())+","+btcup.getInitBtc()+","+btcup.getInitBtc()+","+btcup.getCurrBtc()+","+ratio+"\n";
+                String btcstr=sdf.format(new Date())+","+btcup.getInvestBtc()+","+btcup.getInitBtc()+","+btcup.getCurrBtc()+","+ratio+"\n";
                 FileUtils.write(new File(btcLog), btcstr, "gb2312", true);
                 System.out.print(btcstr);
 
