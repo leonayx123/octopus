@@ -10,12 +10,15 @@ import com.sdyc.service.exapi.ExDataServiceFactory;
 import com.sdyc.service.record.RecordService;
 import com.sdyc.service.wallet.CmdAdjustService;
 import com.sdyc.service.wallet.WalletService;
+import com.sdyc.sys.Config;
 import junit.framework.Assert;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -215,7 +218,11 @@ public class Business  {
                 //修改btc变化数据
                 walletService.updateUserBtc(btcup);
 
+                String btcLog= Config.get("log.dir")+"/output/btclog.csv";
 
+                String btcstr=sdf.format(new Date())+","+btcup.getInitBtc()+","+btcup.getInitBtc()+","+btcup.getCurrBtc()+","+ratio+"\n";
+                FileUtils.write(new File(btcLog), btcstr, "gb2312", true);
+                System.out.print(btcstr);
 
             }else if(btc.getCurrBtc().doubleValue()>currBtc) {
                 log.error("WTF !!! curr btc 居然减少了,下面是当前详情!!====> "+currBtc);
