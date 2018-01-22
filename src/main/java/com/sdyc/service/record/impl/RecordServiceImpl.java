@@ -16,7 +16,7 @@ import java.util.Map;
  * Date:        2018/1/18  18:52
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
- * Company:     陕西识代运筹信息科技有限公司
+ * Company:     锟斤拷锟斤拷识锟斤拷锟剿筹拷锟斤拷息锟狡硷拷锟斤拷锟睫癸拷司
  * Discription:
  *
  * Modify:      2018/1/18  18:52
@@ -38,7 +38,7 @@ public class RecordServiceImpl implements RecordService {
 
 
     /**
-     * 记录交易流水
+     *
      *
      * @param recordBean
      * @return

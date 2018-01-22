@@ -249,42 +249,6 @@ public class TraderCore {
 
 
 
-            //        try {
-//            DataService higthService = exServiceFactory.getService(higherEx);
-//
-//            System.out.println("\n i sell  at ==>"+higherEx+" :" + icoCpl+","+higher_bid_2_val+","+minTradbleQtty);
-//
-//            JSONObject hightres =
-//                higthService.sell(icoCpl,higher_bid_2_val,minTradbleQtty);
-//
-//
-//            Object result= hightres.get("result");
-//            boolean needBuy=true;
-//            if(result instanceof Boolean){
-//                needBuy=(Boolean)result;
-//            }
-//           else if( result instanceof  String){
-//                needBuy=Boolean.parseBoolean((String)result);
-//            }
-//
-//            if(!needBuy){
-//                System.out.println("sell res are false, not buy anything");
-//                return 4;
-//
-//
-//            }
-//            DataService lowService =  exServiceFactory.getService(lowerEx);
-//
-//            System.out.println("\n i buy  at==>"+lowerEx+":" + icoCpl+","+lower_ask_2_val+","+minTradbleQtty);
-//
-//             JSONObject lowrs= lowService.buy(icoCpl, lower_ask_2_val, minTradbleQtty);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-
-
 
 
         } catch (Exception e) {

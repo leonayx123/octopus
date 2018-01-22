@@ -4,19 +4,8 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
- * <pre>
- * User:        yangxun
- * Date:        2018/1/20  17:30
- * Email:       yangxun@nowledgedata.com.cn
- * Version      V1.0
- * Company:     陕西识代运筹信息科技有限公司
- * Discription:
- *
- * Modify:      2018/1/20  17:30
- * Author:
- * </pre>
+ * Created by yangxun on 2018-01-22.
  */
-
 @Entity
 @Table(name = "acc_user_exchange", schema = "", catalog = "btcfactory")
 public class AccUserExchangeDTO {
@@ -25,6 +14,8 @@ public class AccUserExchangeDTO {
     private String exchangeId;
     private Timestamp createDate;
     private Byte isActive;
+    private String key;
+    private String secert;
 
     @Id
     @Column(name = "guid")
@@ -76,6 +67,26 @@ public class AccUserExchangeDTO {
         this.isActive = isActive;
     }
 
+    @Basic
+    @Column(name = "key")
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    @Basic
+    @Column(name = "secert")
+    public String getSecert() {
+        return secert;
+    }
+
+    public void setSecert(String secert) {
+        this.secert = secert;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -83,11 +94,13 @@ public class AccUserExchangeDTO {
 
         AccUserExchangeDTO that = (AccUserExchangeDTO) o;
 
-        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
-        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
-        if (exchangeId != null ? !exchangeId.equals(that.exchangeId) : that.exchangeId != null) return false;
         if (createDate != null ? !createDate.equals(that.createDate) : that.createDate != null) return false;
+        if (exchangeId != null ? !exchangeId.equals(that.exchangeId) : that.exchangeId != null) return false;
+        if (guid != null ? !guid.equals(that.guid) : that.guid != null) return false;
         if (isActive != null ? !isActive.equals(that.isActive) : that.isActive != null) return false;
+        if (key != null ? !key.equals(that.key) : that.key != null) return false;
+        if (secert != null ? !secert.equals(that.secert) : that.secert != null) return false;
+        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
 
         return true;
     }
@@ -99,6 +112,8 @@ public class AccUserExchangeDTO {
         result = 31 * result + (exchangeId != null ? exchangeId.hashCode() : 0);
         result = 31 * result + (createDate != null ? createDate.hashCode() : 0);
         result = 31 * result + (isActive != null ? isActive.hashCode() : 0);
+        result = 31 * result + (key != null ? key.hashCode() : 0);
+        result = 31 * result + (secert != null ? secert.hashCode() : 0);
         return result;
     }
 }

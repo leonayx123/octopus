@@ -1,6 +1,8 @@
-package com.sdyc.service.record;
+ï»¿package com.sdyc.service.record;
 
 import com.sdyc.beans.TradeRecordBean;
+import com.sdyc.dto.RecordBtcAddDTO;
+import com.sdyc.dto.RecordTradeTurnoverDTO;
 
 /**
  * <pre>
@@ -8,9 +10,9 @@ import com.sdyc.beans.TradeRecordBean;
  * Date:        2018/1/18  18:08
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
- * Company:     ÉÂÎ÷Ê¶´úÔË³ïĞÅÏ¢¿Æ¼¼ÓĞÏŞ¹«Ë¾
- * Discription:
- *  ÕâÊÇÒ»´ÎÈÎÎñÖÜÆÚµÄÊı¾İ·şÎñ. »á²éÑ¯³öÕâ´ÎÈÎÎñĞèÒªµÄÊı¾İ.È»ºó¾Ö²¿µÄĞŞ¸Ä
+ * Company:    
+ * Discription:  ç”¨æ¥è®°å½•æ—¥å¿—å’Œæµæ°´
+ *  
  *
  * Modify:      2018/1/18  18:08
  * Author:
@@ -20,15 +22,21 @@ import com.sdyc.beans.TradeRecordBean;
 public interface RecordService {
 
     /**
-     * ¼ÇÂ¼½»Ò×Á÷Ë®
      *
-     * @param recordBean
+     *ä¿å­˜äº¤æ˜“å¯¹æ¯”è®°å½•
+     * @param tradeTurnover
      * @return
      */
-    public TradeRecordBean saveTradeRecord(TradeRecordBean recordBean) throws Exception ;
+    public TradeRecordBean saveTradeRecord(RecordTradeTurnoverDTO tradeTurnover) throws Exception ;
 
 
 
-
+    /**
+     *
+     *ä¿å­˜btcå¢é•¿è®°å½•
+     * @param
+     * @return
+     */
+    public TradeRecordBean saveTradeRecord(RecordBtcAddDTO recordBtcAdd) throws Exception ;
 
 }
