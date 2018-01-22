@@ -1,20 +1,38 @@
 package com.sdyc.dto;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
  * Created by yangxun on 2018-01-22.
  */
 @Entity
-@javax.persistence.Table(name = "record_trade_turnover", schema = "", catalog = "btcfactory")
+@Table(name = "record_trade_turnover", schema = "", catalog = "btcfactory")
 public class RecordTradeTurnoverDTO {
     private long seqkey;
+    private String userId;
+    private String exchangeId;
+    private String coinId;
+    private int status;
+    private String higherEx;
+    private Double higherBidVal1;
+    private Double higherBidVal2;
+    private Double higherBidVal3;
+    private String lowerEx;
+    private Double lowerAskVal1;
+    private Double lowerAskVal2;
+    private Double lowerAskVal3;
+    private Double priceDiff;
+    private Double minTradbleQtty;
+    private Double tradeValueBuy;
+    private Double tradeValueSell;
+    private Double tradeValueMargin;
+    private Double tradeValueMarginPct;
+    private Timestamp time;
+    private String msg;
 
     @Id
-    @javax.persistence.Column(name = "seqkey")
+    @Column(name = "seqkey")
     public long getSeqkey() {
         return seqkey;
     }
@@ -23,10 +41,8 @@ public class RecordTradeTurnoverDTO {
         this.seqkey = seqkey;
     }
 
-    private String userId;
-
     @Basic
-    @javax.persistence.Column(name = "userId")
+    @Column(name = "userId")
     public String getUserId() {
         return userId;
     }
@@ -35,10 +51,8 @@ public class RecordTradeTurnoverDTO {
         this.userId = userId;
     }
 
-    private String exchangeId;
-
     @Basic
-    @javax.persistence.Column(name = "exchangeId")
+    @Column(name = "exchangeId")
     public String getExchangeId() {
         return exchangeId;
     }
@@ -47,10 +61,8 @@ public class RecordTradeTurnoverDTO {
         this.exchangeId = exchangeId;
     }
 
-    private String coinId;
-
     @Basic
-    @javax.persistence.Column(name = "coinId")
+    @Column(name = "coinId")
     public String getCoinId() {
         return coinId;
     }
@@ -59,22 +71,18 @@ public class RecordTradeTurnoverDTO {
         this.coinId = coinId;
     }
 
-    private Byte status;
-
     @Basic
-    @javax.persistence.Column(name = "status")
-    public Byte getStatus() {
+    @Column(name = "status")
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
-    private String higherEx;
-
     @Basic
-    @javax.persistence.Column(name = "higherEx")
+    @Column(name = "higherEx")
     public String getHigherEx() {
         return higherEx;
     }
@@ -83,10 +91,8 @@ public class RecordTradeTurnoverDTO {
         this.higherEx = higherEx;
     }
 
-    private Double higherBidVal1;
-
     @Basic
-    @javax.persistence.Column(name = "higherBidVal1")
+    @Column(name = "higherBidVal1")
     public Double getHigherBidVal1() {
         return higherBidVal1;
     }
@@ -95,10 +101,8 @@ public class RecordTradeTurnoverDTO {
         this.higherBidVal1 = higherBidVal1;
     }
 
-    private Double higherBidVal2;
-
     @Basic
-    @javax.persistence.Column(name = "higherBidVal2")
+    @Column(name = "higherBidVal2")
     public Double getHigherBidVal2() {
         return higherBidVal2;
     }
@@ -107,10 +111,8 @@ public class RecordTradeTurnoverDTO {
         this.higherBidVal2 = higherBidVal2;
     }
 
-    private Double higherBidVal3;
-
     @Basic
-    @javax.persistence.Column(name = "higherBidVal3")
+    @Column(name = "higherBidVal3")
     public Double getHigherBidVal3() {
         return higherBidVal3;
     }
@@ -119,10 +121,8 @@ public class RecordTradeTurnoverDTO {
         this.higherBidVal3 = higherBidVal3;
     }
 
-    private String lowerEx;
-
     @Basic
-    @javax.persistence.Column(name = "lowerEx")
+    @Column(name = "lowerEx")
     public String getLowerEx() {
         return lowerEx;
     }
@@ -131,10 +131,8 @@ public class RecordTradeTurnoverDTO {
         this.lowerEx = lowerEx;
     }
 
-    private Double lowerAskVal1;
-
     @Basic
-    @javax.persistence.Column(name = "lowerAskVal1")
+    @Column(name = "lowerAskVal1")
     public Double getLowerAskVal1() {
         return lowerAskVal1;
     }
@@ -143,10 +141,8 @@ public class RecordTradeTurnoverDTO {
         this.lowerAskVal1 = lowerAskVal1;
     }
 
-    private Double lowerAskVal2;
-
     @Basic
-    @javax.persistence.Column(name = "lowerAskVal2")
+    @Column(name = "lowerAskVal2")
     public Double getLowerAskVal2() {
         return lowerAskVal2;
     }
@@ -155,10 +151,8 @@ public class RecordTradeTurnoverDTO {
         this.lowerAskVal2 = lowerAskVal2;
     }
 
-    private Double lowerAskVal3;
-
     @Basic
-    @javax.persistence.Column(name = "lowerAskVal3")
+    @Column(name = "lowerAskVal3")
     public Double getLowerAskVal3() {
         return lowerAskVal3;
     }
@@ -167,10 +161,8 @@ public class RecordTradeTurnoverDTO {
         this.lowerAskVal3 = lowerAskVal3;
     }
 
-    private Double priceDiff;
-
     @Basic
-    @javax.persistence.Column(name = "priceDiff")
+    @Column(name = "priceDiff")
     public Double getPriceDiff() {
         return priceDiff;
     }
@@ -179,10 +171,8 @@ public class RecordTradeTurnoverDTO {
         this.priceDiff = priceDiff;
     }
 
-    private Double minTradbleQtty;
-
     @Basic
-    @javax.persistence.Column(name = "minTradbleQtty")
+    @Column(name = "minTradbleQtty")
     public Double getMinTradbleQtty() {
         return minTradbleQtty;
     }
@@ -191,10 +181,8 @@ public class RecordTradeTurnoverDTO {
         this.minTradbleQtty = minTradbleQtty;
     }
 
-    private Double tradeValueBuy;
-
     @Basic
-    @javax.persistence.Column(name = "tradeValueBuy")
+    @Column(name = "tradeValueBuy")
     public Double getTradeValueBuy() {
         return tradeValueBuy;
     }
@@ -203,10 +191,8 @@ public class RecordTradeTurnoverDTO {
         this.tradeValueBuy = tradeValueBuy;
     }
 
-    private Double tradeValueSell;
-
     @Basic
-    @javax.persistence.Column(name = "tradeValueSell")
+    @Column(name = "tradeValueSell")
     public Double getTradeValueSell() {
         return tradeValueSell;
     }
@@ -215,10 +201,8 @@ public class RecordTradeTurnoverDTO {
         this.tradeValueSell = tradeValueSell;
     }
 
-    private Double tradeValueMargin;
-
     @Basic
-    @javax.persistence.Column(name = "tradeValueMargin")
+    @Column(name = "tradeValueMargin")
     public Double getTradeValueMargin() {
         return tradeValueMargin;
     }
@@ -227,10 +211,8 @@ public class RecordTradeTurnoverDTO {
         this.tradeValueMargin = tradeValueMargin;
     }
 
-    private Double tradeValueMarginPct;
-
     @Basic
-    @javax.persistence.Column(name = "tradeValueMarginPct")
+    @Column(name = "tradeValueMarginPct")
     public Double getTradeValueMarginPct() {
         return tradeValueMarginPct;
     }
@@ -239,10 +221,8 @@ public class RecordTradeTurnoverDTO {
         this.tradeValueMarginPct = tradeValueMarginPct;
     }
 
-    private Timestamp time;
-
     @Basic
-    @javax.persistence.Column(name = "time")
+    @Column(name = "time")
     public Timestamp getTime() {
         return time;
     }
@@ -259,33 +239,7 @@ public class RecordTradeTurnoverDTO {
         RecordTradeTurnoverDTO that = (RecordTradeTurnoverDTO) o;
 
         if (seqkey != that.seqkey) return false;
-        if (coinId != null ? !coinId.equals(that.coinId) : that.coinId != null) return false;
-        if (exchangeId != null ? !exchangeId.equals(that.exchangeId) : that.exchangeId != null) return false;
-        if (higherBidVal1 != null ? !higherBidVal1.equals(that.higherBidVal1) : that.higherBidVal1 != null)
-            return false;
-        if (higherBidVal2 != null ? !higherBidVal2.equals(that.higherBidVal2) : that.higherBidVal2 != null)
-            return false;
-        if (higherBidVal3 != null ? !higherBidVal3.equals(that.higherBidVal3) : that.higherBidVal3 != null)
-            return false;
-        if (higherEx != null ? !higherEx.equals(that.higherEx) : that.higherEx != null) return false;
-        if (lowerAskVal1 != null ? !lowerAskVal1.equals(that.lowerAskVal1) : that.lowerAskVal1 != null) return false;
-        if (lowerAskVal2 != null ? !lowerAskVal2.equals(that.lowerAskVal2) : that.lowerAskVal2 != null) return false;
-        if (lowerAskVal3 != null ? !lowerAskVal3.equals(that.lowerAskVal3) : that.lowerAskVal3 != null) return false;
-        if (lowerEx != null ? !lowerEx.equals(that.lowerEx) : that.lowerEx != null) return false;
-        if (minTradbleQtty != null ? !minTradbleQtty.equals(that.minTradbleQtty) : that.minTradbleQtty != null)
-            return false;
-        if (priceDiff != null ? !priceDiff.equals(that.priceDiff) : that.priceDiff != null) return false;
-        if (status != null ? !status.equals(that.status) : that.status != null) return false;
-        if (time != null ? !time.equals(that.time) : that.time != null) return false;
-        if (tradeValueBuy != null ? !tradeValueBuy.equals(that.tradeValueBuy) : that.tradeValueBuy != null)
-            return false;
-        if (tradeValueMargin != null ? !tradeValueMargin.equals(that.tradeValueMargin) : that.tradeValueMargin != null)
-            return false;
-        if (tradeValueMarginPct != null ? !tradeValueMarginPct.equals(that.tradeValueMarginPct) : that.tradeValueMarginPct != null)
-            return false;
-        if (tradeValueSell != null ? !tradeValueSell.equals(that.tradeValueSell) : that.tradeValueSell != null)
-            return false;
-        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
+
 
         return true;
     }
@@ -293,25 +247,17 @@ public class RecordTradeTurnoverDTO {
     @Override
     public int hashCode() {
         int result = (int) (seqkey ^ (seqkey >>> 32));
-        result = 31 * result + (userId != null ? userId.hashCode() : 0);
-        result = 31 * result + (exchangeId != null ? exchangeId.hashCode() : 0);
-        result = 31 * result + (coinId != null ? coinId.hashCode() : 0);
-        result = 31 * result + (status != null ? status.hashCode() : 0);
-        result = 31 * result + (higherEx != null ? higherEx.hashCode() : 0);
-        result = 31 * result + (higherBidVal1 != null ? higherBidVal1.hashCode() : 0);
-        result = 31 * result + (higherBidVal2 != null ? higherBidVal2.hashCode() : 0);
-        result = 31 * result + (higherBidVal3 != null ? higherBidVal3.hashCode() : 0);
-        result = 31 * result + (lowerEx != null ? lowerEx.hashCode() : 0);
-        result = 31 * result + (lowerAskVal1 != null ? lowerAskVal1.hashCode() : 0);
-        result = 31 * result + (lowerAskVal2 != null ? lowerAskVal2.hashCode() : 0);
-        result = 31 * result + (lowerAskVal3 != null ? lowerAskVal3.hashCode() : 0);
-        result = 31 * result + (priceDiff != null ? priceDiff.hashCode() : 0);
-        result = 31 * result + (minTradbleQtty != null ? minTradbleQtty.hashCode() : 0);
-        result = 31 * result + (tradeValueBuy != null ? tradeValueBuy.hashCode() : 0);
-        result = 31 * result + (tradeValueSell != null ? tradeValueSell.hashCode() : 0);
-        result = 31 * result + (tradeValueMargin != null ? tradeValueMargin.hashCode() : 0);
-        result = 31 * result + (tradeValueMarginPct != null ? tradeValueMarginPct.hashCode() : 0);
-        result = 31 * result + (time != null ? time.hashCode() : 0);
+
         return result;
+    }
+
+    @Basic
+    @Column(name = "msg")
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 }

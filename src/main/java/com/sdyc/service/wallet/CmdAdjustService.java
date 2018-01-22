@@ -1,4 +1,4 @@
-package com.sdyc.service.wallet;
+ï»¿package com.sdyc.service.wallet;
 
 import com.sdyc.dto.CmdBalanceAdjustDTO;
 
@@ -10,13 +10,13 @@ import java.util.List;
 public interface CmdAdjustService {
 
     /**
-     * ÕâÊÇÖ´ĞĞÃüÁîµÄÖ÷³ÌĞò
+     * è¿™æ˜¯æ‰§è¡Œå‘½ä»¤çš„ä¸»ç¨‹åº
      * @return
      */
     public boolean   doAllCmds();
 
     /**
-     * Ö´ĞĞÃ¿Ò»ÌõÃüÁî ´øÊÂÎñ
+     * æ‰§è¡Œæ¯ä¸€æ¡å‘½ä»¤ å¸¦äº‹åŠ¡
      * @return
      */
     public boolean  DoCmdAdjust(CmdBalanceAdjustDTO cmd) throws  Exception;
@@ -24,14 +24,14 @@ public interface CmdAdjustService {
 
 
     /**
-     * »ñÈ¡ËùÓĞ´ú°ìÃüÁîÁĞ±í
+     * è·å–æ‰€æœ‰ä»£åŠå‘½ä»¤åˆ—è¡¨
      * @return
      */
     public List<CmdBalanceAdjustDTO>   getAllBalanceAdjust() throws  Exception;
 
 
     /**
-     * Ö´ĞĞËùÓĞÃüÁî
+     * æ‰§è¡Œæ‰€æœ‰å‘½ä»¤
      * @param
      */
     public void changeStatusForAdjust(CmdBalanceAdjustDTO cmd) throws  Exception;

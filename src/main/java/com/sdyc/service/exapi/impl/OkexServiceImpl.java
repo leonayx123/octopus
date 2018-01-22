@@ -7,6 +7,7 @@ import com.okcoin.rest.stock.IStockRestApi;
 import com.okcoin.rest.stock.impl.StockRestApi;
 import com.sdyc.beans.AccountBalances;
 import com.sdyc.beans.Depth;
+import com.sdyc.beans.ExAccount;
 import com.sdyc.beans.PriceBean;
 import com.sdyc.service.exapi.DataService;
 import com.sdyc.sys.Config;
@@ -34,17 +35,11 @@ import java.util.Map;
 @Component("okexDataService")
 public class OkexServiceImpl implements DataService {
 
-    // gate.io  api_secret
-    private static String SECRET = "6C3EE8B5A262FAC423A1E40EAA4777EE";
-    //gate.io api key
-    private static String KEY = "c574641b-4047-41e9-b40f-6ecbda0c960c";
 
     private  static HashMap<String,String> cpsMap=new HashMap<String, String>();
 
     private final static String exchangeName="okex";
 
-
-    private static  IStockRestApi stockPost = new StockRestApi("https://www.okex.com", KEY, SECRET);
 
     static {
         String[] cps=   Config.get("icos.cps").split(",");
@@ -222,10 +217,10 @@ public class OkexServiceImpl implements DataService {
     /**
      * get my  all ico balances;
      */
-    public AccountBalances getBalances() throws Exception {
+    public AccountBalances getBalances(ExAccount exAccount) throws Exception {
 
 
-        IStockRestApi stockPost = new StockRestApi("https://www.okex.com", this.KEY, this.SECRET);
+        IStockRestApi stockPost = new StockRestApi("https://www.okex.com",exAccount.getKey(), exAccount.getSecret());
 
 
 
@@ -247,28 +242,31 @@ public class OkexServiceImpl implements DataService {
     }
 
 
-    public JSONObject buy(String currencyPair,Double rate, Double amount)throws Exception{
+    public JSONObject buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception{
 
 
         String mycp=  getMyCp(currencyPair);
+        IStockRestApi stockPost = new StockRestApi("https://www.okex.com", exAccount.getKey(), exAccount.getSecret());
         //现货下单交易
         String tradeResult = stockPost.trade(mycp, "buy",String.valueOf(rate), String.valueOf(amount));
 
         return JSON.parseObject(tradeResult);
     }
 
-    public JSONObject sell(String currencyPair,Double rate, Double amount) throws Exception {
+    public JSONObject sell(ExAccount exAccount,String currencyPair,Double rate, Double amount) throws Exception {
 
 
         String mycp=  getMyCp(currencyPair);
+        IStockRestApi stockPost = new StockRestApi("https://www.okex.com", exAccount.getKey(), exAccount.getSecret());
         //现货下单交易
         String tradeResult = stockPost.trade(mycp, "sell", String.valueOf(rate), String.valueOf(amount));
 
         return JSON.parseObject(tradeResult);
     }
 
-    public JSONObject getOrder(String orderNumber, String currencyPair) throws Exception {
+    public JSONObject getOrder(ExAccount exAccount,String orderNumber, String currencyPair) throws Exception {
         String mycp=  getMyCp(currencyPair);
+        IStockRestApi stockPost = new StockRestApi("https://www.okex.com", exAccount.getKey(), exAccount.getSecret());
         //现货获取用户订单信息
         String result =  stockPost.order_info(mycp, orderNumber);
         //System.out.print(result);

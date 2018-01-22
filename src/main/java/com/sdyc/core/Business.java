@@ -3,22 +3,19 @@ package com.sdyc.core;
 import com.sdyc.beans.Depth;
 import com.sdyc.beans.IcoAccount;
 import com.sdyc.beans.PriceBean;
-import com.sdyc.dto.AccUserBtcDTO;
-import com.sdyc.dto.AccUserExSetingDTO;
+import com.sdyc.dto.*;
+import com.sdyc.service.account.AccountService;
 import com.sdyc.service.exapi.DataService;
 import com.sdyc.service.exapi.ExDataServiceFactory;
 import com.sdyc.service.record.RecordService;
 import com.sdyc.service.wallet.CmdAdjustService;
 import com.sdyc.service.wallet.WalletService;
-import com.sdyc.sys.Config;
-import junit.framework.Assert;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -48,13 +45,15 @@ public class Business  {
     TraderCore traderCore;
 
     @Resource
-    RecordService recordService;
-
-    @Resource
     WalletService walletService;
 
     @Resource
     CmdAdjustService cmdAdjustService;
+
+    @Resource
+    AccountService accountService;
+    @Resource
+    RecordService recordService;
 
 
 
@@ -72,11 +71,10 @@ public class Business  {
 
         String userId="1mil10coins";
 
-
-
-
         AccUserExSetingDTO userExSetingDTO=null;
         BuniessDataContext context=null;
+        //这是记录交易日志的
+        RecordTradeTurnoverDTO tradeTurnover=null;
         try {
             //开始调用 币数修改任务.进行币数调整
             cmdAdjustService.doAllCmds();
@@ -84,20 +82,22 @@ public class Business  {
 
             //获取最新的钱包信息
             List<IcoAccount>  accounts = walletService.getAccount(userId);
+            //获取用户的账号信息
+            List<AccUserExchangeDTO>  userExchanges=  accountService.getUserExchanges(userId);
 
-            context=new BuniessDataContext(accounts);
+            context=new BuniessDataContext(accounts,userExchanges);
 
             //查询用户的btc信息
             userExSetingDTO= walletService.getUserExSetting(userId);
 
-            Assert.assertNotNull(userExSetingDTO);
-            Assert.assertNotNull(userExSetingDTO.getUserCoins());
-            Assert.assertNotNull(userExSetingDTO.getUserExchanges());
+            Assert.notNull(userExSetingDTO);
+            Assert.notNull(userExSetingDTO.getUserCoins());
+            Assert.notNull(userExSetingDTO.getUserExchanges());
 
 
         } catch (Exception e) {
 
-            log.error("钱包数据初始化出错",e);
+            log.error("用户基础数据初始化出错",e);
             return;
         }
         //取到用户关注的 币对
@@ -168,11 +168,22 @@ public class Business  {
                  Depth[] higherBids =null;
                  Depth[] lowerAsks=null;
 
+
                  //获取最高价的交易所的数据服务类
                  DataService highExDataService=exServiceFactory.getService(higherEx);
 
                  //获取最低价的交易所的数据服务类
                  DataService lowExDataService=exServiceFactory.getService(lowerEx);
+
+                 IcoAccount hicoAccount= context.getUserExWalletData(higherEx);
+                 //如果此用户高价的交易所 没有待交易币的余额 直接跳过
+                 if(hicoAccount.getIcoValue(cp)==0.0){
+                     continue;
+                 }
+                 //如果此用户低价的交易所 没有铆钉币的余额 直接跳过
+                 if(hicoAccount.getBtc()==0.0){
+                     continue;
+                 }
 
                  higherBids=highExDataService.getDeepData(cp, "bids");
                  lowerAsks= lowExDataService.getDeepData(cp, "asks");
@@ -182,6 +193,14 @@ public class Business  {
                      continue;
                  }
 
+
+                 tradeTurnover=new RecordTradeTurnoverDTO();
+                 tradeTurnover.setUserId(userId);
+                 tradeTurnover.setCoinId(cp);
+                 tradeTurnover.setHigherEx(higherEx);
+                 tradeTurnover.setLowerEx(lowerEx);
+
+                 context.setAttr("tradeTrunover", tradeTurnover);
                  //传入context. 数据修改都在Contex里操作
                  traderCore.doTrade(context,higherBids,lowerAsks,0,0,cp ,higherEx,lowerEx);
 
@@ -203,6 +222,7 @@ public class Business  {
                 currBtc=currBtc+account.getBtc();
             }
 
+            //重新获取用户最新的btc数据
             AccUserBtcDTO btc=walletService.getUserBtc(userId);
 
             //当前值不等于 上次的btc值 才需要做记录 说明增加了.
@@ -211,18 +231,16 @@ public class Business  {
                 //Core.lastBtc =btc.getCurrBtc().doubleValue();
                 Double ratio=(currBtc - btc.getInitBtc().doubleValue())/ btc.getInvestBtc().doubleValue();
                 AccUserBtcDTO btcup=new AccUserBtcDTO();
-
+                btcup.setInvestBtc(btc.getInvestBtc());
+                btcup.setInitBtc(btc.getInitBtc());
                 btcup.setCurrBtc(new BigDecimal(currBtc));
                 btcup.setAddRatio(ratio);
                 btcup.setUserId(userId);
                 //修改btc变化数据
                 walletService.updateUserBtc(btcup);
 
-                String btcLog= Config.get("log.dir")+"/output/btclog.csv";
-
-                String btcstr=sdf.format(new Date())+","+btcup.getInvestBtc()+","+btcup.getInitBtc()+","+btcup.getCurrBtc()+","+ratio+"\n";
-                FileUtils.write(new File(btcLog), btcstr, "gb2312", true);
-                System.out.print(btcstr);
+                //记录变化日志
+                recordService.saveBtcAddRecord(new RecordBtcAddDTO(btcup));
 
             }else if(btc.getCurrBtc().doubleValue()>currBtc) {
                 log.error("WTF !!! curr btc 居然减少了,下面是当前详情!!====> "+currBtc);

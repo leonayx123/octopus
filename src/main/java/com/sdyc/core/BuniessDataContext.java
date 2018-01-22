@@ -1,6 +1,8 @@
-package com.sdyc.core;
+ï»¿package com.sdyc.core;
 
+import com.sdyc.beans.ExAccount;
 import com.sdyc.beans.IcoAccount;
+import com.sdyc.dto.AccUserExchangeDTO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,23 +12,58 @@ import java.util.Map;
 /**
  * Created by yangxun on 2018-01-21.
  *
- * ÓÃ×÷ÔÚÈÎÎñÖĞ´«ÊäÊı¾İÓÃ. ÊÇÊı¾İµÄÉÏÏÂÎÄ. ĞèÒªµÄÊı¾İ¶¼¿ÉÒÔÍùÕâÀïÃæ·Å
+ * ç”¨ä½œåœ¨ä»»åŠ¡ä¸­ä¼ è¾“æ•°æ®ç”¨. æ˜¯æ•°æ®çš„ä¸Šä¸‹æ–‡. éœ€è¦çš„æ•°æ®éƒ½å¯ä»¥å¾€è¿™é‡Œé¢æ”¾
  */
 public class BuniessDataContext {
 
-    private static Map<String,IcoAccount> taskIcoAccounts;
+    private  Map<String,IcoAccount> taskIcoAccounts;
 
-    BuniessDataContext(List<IcoAccount> accs){
-        taskIcoAccounts=new HashMap<String, IcoAccount>();
+    private Map<String,ExAccount> exAccountMap;
+
+    //å­˜æ”¾ä¸€äº›å…¶ä»–ä¸šåŠ¡å˜é‡
+    private Map<String,Object>attrbuite=new HashMap<String, Object>();
+
+    /**
+     * å¯ä»¥å¯¹è¿™äº›ä¸šåŠ¡å˜é‡å¢åˆ æ”¹
+     * @param k
+     * @param o
+     */
+    public void setAttr(String k,Object o){
+        this.attrbuite.put(k,o);
+    }
+    public Object getAttr(String key){
+        return attrbuite.get(key);
+    }
+    public Object removeAttr(String key){
+       return  attrbuite.remove(key);
+    }
+
+    /**
+     * åˆå§‹åŒ– éœ€è¦è´¦å·ä¿¡æ¯ å’Œ ç”¨æˆ·çš„keyä¿¡æ¯
+     * @param accs
+     * @param userExchangeDTOs
+     */
+    BuniessDataContext(List<IcoAccount> accs,List<AccUserExchangeDTO> userExchangeDTOs){
+        this.taskIcoAccounts=new HashMap<String, IcoAccount>();
         for(int  i=0;i< accs.size();i++){
             IcoAccount icoAccount=accs.get(i);
-            taskIcoAccounts.put(icoAccount.getExchange(),icoAccount);
+            this.taskIcoAccounts.put(icoAccount.getExchange(),icoAccount);
+        }
+
+        this.exAccountMap=new HashMap<String, ExAccount>();
+        for(AccUserExchangeDTO userExchangeDTO:userExchangeDTOs){
+            ExAccount exAccount=new ExAccount();
+            exAccount.setExchangeId(userExchangeDTO.getExchangeId());
+            exAccount.setKey(userExchangeDTO.getKey());
+            exAccount.setSecret(exAccount.getSecret());
+
+            this.exAccountMap.put(userExchangeDTO.getExchangeId(),exAccount);
         }
     }
 
 
     /**
-     * ·µ»Ø×îÖÕµÄĞŞ¸Ä¹ıµÄÊı¾İ
+     * è¿”å›æœ€ç»ˆçš„ä¿®æ”¹è¿‡çš„æ•°æ®
      * @return
      */
     public List<IcoAccount> getContextIcoAccountDatas(){
@@ -35,16 +72,25 @@ public class BuniessDataContext {
 
 
     /**
-     * »ñÈ¡¸öÈËµÄÕËºÅÊı¾İ
+     * è·å–ä¸ªäººçš„è´¦å·æ•°æ®
      * @param
      * @return
      */
-    public IcoAccount  getUserExAccountData(String exName)throws Exception{
+    public IcoAccount  getUserExWalletData(String exName)throws Exception{
         return taskIcoAccounts.get(exName);
     }
 
     /**
-     * ÓÃÍêÊı¾İºó ÒªÏú»Ù
+     * è·å–æŸä¸ªexchangeçš„è´¦å·ä¿¡æ¯
+     * @param exName
+     * @return
+     */
+    public ExAccount getExchangeAccount(String exName){
+        return this.exAccountMap.get(exName);
+    }
+
+    /**
+     * ç”¨å®Œæ•°æ®å è¦é”€æ¯
      */
     public void  destory(){
         //taskIcoAccounts.clear();

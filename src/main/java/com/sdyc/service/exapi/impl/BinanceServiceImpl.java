@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sdyc.beans.AccountBalances;
 import com.sdyc.beans.Depth;
+import com.sdyc.beans.ExAccount;
 import com.sdyc.beans.PriceBean;
 import com.sdyc.service.exapi.DataService;
 import com.sdyc.sys.Config;
@@ -30,8 +31,6 @@ import java.util.Map;
  */
 @Component("binanceDataService")
 public class BinanceServiceImpl implements DataService {
-    private final static String SECRET = "UomqgvatH2f3Mx4TKHJfUFSJhIaG2mHJmAtPPv1joEmzCEqssxwjxsPkdTidkFe3"; // gate.io ����� api_secret
-    private final static String KEY = "AyDC25NH76l1YLGRu889GMLlJt4d4fPl7co5nvneP9gS5OCTnIUkPtTVJRfpRAoc";    // gate.io ����� api_key
 
     private final static String exchangeName="binance";
 
@@ -178,7 +177,7 @@ public class BinanceServiceImpl implements DataService {
     /**
      * get my  all ico balances;
      */
-    public AccountBalances getBalances() throws Exception {
+    public AccountBalances getBalances(ExAccount exAccount) throws Exception {
         return null;
     }
 
@@ -192,7 +191,7 @@ public class BinanceServiceImpl implements DataService {
      * @return
      * @throws Exception
      */
-    public JSONObject buy(String currencyPair, Double rate, Double amount) throws Exception {
+    public JSONObject buy(ExAccount exAccount,String currencyPair, Double rate, Double amount) throws Exception {
         return null;
     }
 
@@ -205,11 +204,11 @@ public class BinanceServiceImpl implements DataService {
      * @return
      * @throws Exception
      */
-    public JSONObject sell(String currencyPair, Double rate, Double amount) throws Exception {
+    public JSONObject sell(ExAccount exAccount,String currencyPair, Double rate, Double amount) throws Exception {
         return null;
     }
 
-    public JSONObject getOrder(String orderNumber, String currencyPair) throws Exception {
+    public JSONObject getOrder(ExAccount exAccount,String orderNumber, String currencyPair) throws Exception {
         return null;
     }
 }

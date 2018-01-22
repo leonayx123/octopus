@@ -67,7 +67,7 @@ public class OkexServiceImplTest  extends TestBaseSetupService{
 
     @Test
     public void testGetBalances() throws Exception {
-         getTestService().getBalances();
+         getTestService().getBalances(null);
 
     }
 

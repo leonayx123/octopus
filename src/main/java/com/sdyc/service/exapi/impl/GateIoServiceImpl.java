@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sdyc.beans.AccountBalances;
 import com.sdyc.beans.Depth;
+import com.sdyc.beans.ExAccount;
 import com.sdyc.beans.PriceBean;
 import com.sdyc.service.exapi.DataService;
 import com.sdyc.sys.Config;
@@ -33,10 +34,7 @@ import java.util.Map;
 @Component("gateIoDataService")
 public class GateIoServiceImpl implements DataService{
 
-    // gate.io  api_secret
-    private static String SECRET = "c906812402f9c31d1d22779859697f36fa16d8202f5acd1cc4bbd65556ec43dc";
-    //gate.io api key
-    private static String KEY = "57D56DC2-0649-4610-AE20-B020BC2487C2";
+
 
     private  static HashMap<String,String> cpsMap=new HashMap<String, String>();
 
@@ -234,19 +232,19 @@ public class GateIoServiceImpl implements DataService{
     /**
      * get my  all ico balances;
      */
-    public AccountBalances getBalances() throws Exception {
+    public AccountBalances getBalances(ExAccount exAccount) throws Exception {
         String apiUrl="https://api.gate.io/api2/1/private/balances";
 
         Map<String, String> params = new HashMap<String, String>();
-        params.put("api_key", this.KEY);
-        String sign = MD5Util.buildMysignV1(params, this.SECRET);
+        params.put("api_key",exAccount.getKey());
+        String sign = MD5Util.buildMysignV1(params, exAccount.getSecret());
         params.put("sign", sign);
 
 
         try {
             HttpUtilManager httpUtil = HttpUtilManager.getInstance();
 
-            String result = httpUtil.doGateIoRequest("post", apiUrl, params, this.KEY, this.SECRET);
+            String result = httpUtil.doGateIoRequest("post", apiUrl, params,exAccount.getKey(), exAccount.getSecret());
 
             if(StringUtils.isBlank(result)){
                 throw  new Exception("没有获取到账号数据");
@@ -266,7 +264,7 @@ public class GateIoServiceImpl implements DataService{
     }
 
 
-    public JSONObject buy(String currencyPair,Double rate, Double amount)throws Exception{
+    public JSONObject buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception{
         String mycp=  getMyCp(currencyPair);
 
         String BUY_URL = "https://api.gate.io/api2/1/private/buy";
@@ -276,12 +274,12 @@ public class GateIoServiceImpl implements DataService{
         params.put("amount", String.valueOf(amount));
 
         HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doGateIoRequest("post", BUY_URL, params, this.KEY, this.SECRET);
+        String result = httpUtil.doGateIoRequest("post", BUY_URL, params,exAccount.getKey(), exAccount.getSecret());
         System.out.print(result);
         return JSON.parseObject(result);
     }
 
-    public JSONObject sell(String currencyPair,Double rate, Double amount) throws Exception {
+    public JSONObject sell(ExAccount exAccount,String currencyPair,Double rate, Double amount) throws Exception {
         String mycp=  getMyCp(currencyPair);
         String SELL_URL = "https://api.gate.io/api2/1/private/sell";
 
@@ -291,19 +289,19 @@ public class GateIoServiceImpl implements DataService{
         params.put("amount",  String.valueOf(amount));
 
         HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doGateIoRequest("post", SELL_URL, params, this.KEY, this.SECRET);
+        String result = httpUtil.doGateIoRequest("post", SELL_URL, params,exAccount.getKey(), exAccount.getSecret());
         System.out.print(result);
         return JSON.parseObject(result);
     }
 
-    public JSONObject getOrder(String orderNumber, String currencyPair) throws Exception {
+    public JSONObject getOrder(ExAccount exAccount,String orderNumber, String currencyPair) throws Exception {
         String mycp=  getMyCp(currencyPair);
         String GETORDER_URL="https://api.gate.io/api2/1/private/getOrder";
         Map<String, String> params = new HashMap<String, String>();
         params.put("orderNumber", orderNumber);
         params.put("currencyPair", mycp);
         HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doGateIoRequest("post", GETORDER_URL, params, this.KEY, this.SECRET);
+        String result = httpUtil.doGateIoRequest("post", GETORDER_URL, params,exAccount.getKey(), exAccount.getSecret());
         //System.out.print(result);
         return JSON.parseObject(result);
     }

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.sdyc.beans.AccountBalances;
 import com.sdyc.beans.Depth;
+import com.sdyc.beans.ExAccount;
 import com.sdyc.beans.PriceBean;
 import com.sdyc.service.exapi.DataService;
 import com.sdyc.sys.Config;
@@ -25,7 +26,7 @@ import java.util.Map;
  * Date:        2018/1/17  15:55
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
- * Company:     ÉÂÎ÷Ê¶´úÔË³ïÐÅÏ¢¿Æ¼¼ÓÐÏÞ¹«Ë¾
+ * Company:     ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½Ï¢ï¿½Æ¼ï¿½ï¿½ï¿½ï¿½Þ¹ï¿½Ë¾
  * Discription:
  *  doc address   https://www.zb.com/i/developer/restApi#market
  *
@@ -35,10 +36,7 @@ import java.util.Map;
  */
 @Component("zbDataService")
 public class ZbServiceImpl  implements DataService{
-    // gate.io  api_secret
-    private static String SECRET = "e4ea6a04-8d0f-488f-b10c-412c90d2a1d7";
-    //gate.io api key
-    private static String KEY = "11e3eb0d-f26c-42cf-b43d-fc062aaf6a43";
+
 
     private  static HashMap<String,String> cpsMap=new HashMap<String, String>();
 
@@ -60,7 +58,7 @@ public class ZbServiceImpl  implements DataService{
 
 
     /**
-     *»ñÈ¡µ±Ç°½»Ò×ËùµÄÃû³Æ
+     *ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      * @param
      * @return
      */
@@ -70,7 +68,7 @@ public class ZbServiceImpl  implements DataService{
     }
 
     /**
-     *»ñÈ¡µ±Ç°½»Ò×ËùµÄ±Ò¶Ômap
+     *
      * @param
      * @return
      */
@@ -203,22 +201,22 @@ public class ZbServiceImpl  implements DataService{
     /**
      * get my  all ico balances;
      */
-    public AccountBalances getBalances() throws Exception {
+    public AccountBalances getBalances(ExAccount exAccount) throws Exception {
         String apiUrl="https://api.gate.io/api2/1/private/balances";
 
         Map<String, String> params = new HashMap<String, String>();
-        params.put("api_key", this.KEY);
-        String sign = MD5Util.buildMysignV1(params, this.SECRET);
+        params.put("api_key",exAccount.getKey());
+        String sign = MD5Util.buildMysignV1(params, exAccount.getSecret());
         params.put("sign", sign);
 
 
         try {
             HttpUtilManager httpUtil = HttpUtilManager.getInstance();
 
-            String result = httpUtil.doGateIoRequest("post", apiUrl, params,this.KEY,this.SECRET );
+            String result = httpUtil.doGateIoRequest("post", apiUrl, params,exAccount.getKey(),exAccount.getSecret() );
 
             if (StringUtils.isBlank(result)){
-                throw  new Exception("Ã»ÓÐ»ñÈ¡µ½ÕËºÅÊý¾Ý");
+                throw  new Exception("Ã»ï¿½Ð»ï¿½È¡ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½");
 
             }
             JSONObject banlance=  JSONObject.parseObject(result);
@@ -235,7 +233,7 @@ public class ZbServiceImpl  implements DataService{
     }
 
 
-    public JSONObject buy(String currencyPair,Double rate, Double amount)throws Exception{
+    public JSONObject buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception{
         String mycp=  getMyCp(currencyPair);
 
         String BUY_URL = "https://api.gate.io/api2/1/private/buy";
@@ -245,12 +243,12 @@ public class ZbServiceImpl  implements DataService{
         params.put("amount", String.valueOf(amount));
 
         HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doGateIoRequest("post", BUY_URL, params,this.KEY,this.SECRET);
+        String result = httpUtil.doGateIoRequest("post", BUY_URL, params,exAccount.getKey(),exAccount.getSecret());
         System.out.print(result);
         return JSON.parseObject(result);
     }
 
-    public JSONObject sell(String currencyPair,Double rate, Double amount) throws Exception {
+    public JSONObject sell(ExAccount exAccount,String currencyPair,Double rate, Double amount) throws Exception {
         String mycp=  getMyCp(currencyPair);
         String SELL_URL = "https://api.gate.io/api2/1/private/sell";
 
@@ -260,19 +258,19 @@ public class ZbServiceImpl  implements DataService{
         params.put("amount",  String.valueOf(amount));
 
         HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doGateIoRequest(  "post", SELL_URL, params,this.KEY,this.SECRET );
+        String result = httpUtil.doGateIoRequest(  "post", SELL_URL, params,exAccount.getKey(),exAccount.getSecret() );
         System.out.print(result);
         return JSON.parseObject(result);
     }
 
-    public JSONObject getOrder(String orderNumber, String currencyPair) throws Exception {
+    public JSONObject getOrder(ExAccount exAccount,String orderNumber, String currencyPair) throws Exception {
         String mycp=  getMyCp(currencyPair);
         String GETORDER_URL="https://api.gate.io/api2/1/private/getOrder";
         Map<String, String> params = new HashMap<String, String>();
         params.put("orderNumber", orderNumber);
         params.put("currencyPair", mycp);
         HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doGateIoRequest( "post", GETORDER_URL, params,this.KEY,this.SECRET  );
+        String result = httpUtil.doGateIoRequest( "post", GETORDER_URL, params,exAccount.getKey(),exAccount.getSecret()  );
         //System.out.print(result);
         return JSON.parseObject(result);
     }

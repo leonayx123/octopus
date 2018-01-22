@@ -1,4 +1,4 @@
-package com.sdyc.service.exapi;
+ï»¿package com.sdyc.service.exapi;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeansException;
@@ -15,7 +15,7 @@ import javax.annotation.Resource;
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
  * Company:
- * Discription: ÕâÊÇÒ»¸ö¹¤³§Àà. ¸ù¾İ½»Ò×ËùÃû³Æ.»ñÈ¡µ±Ç°½»Ò×ËùµÄÊı¾İ·şÎñÀà
+ * Discription: è¿™æ˜¯ä¸€ä¸ªå·¥å‚ç±». æ ¹æ®äº¤æ˜“æ‰€åç§°.è·å–å½“å‰äº¤æ˜“æ‰€çš„æ•°æ®æœåŠ¡ç±»
  *
  * Modify:      2018/1/17  13:33
  * Author:
@@ -33,7 +33,7 @@ public class ExDataServiceFactory implements ApplicationContextAware {
       }
 
       /**
-       * »ñÈ¡Ò»¸ö½»Ò×³¡ËùµÄÊı¾İ·şÎñ
+       * è·å–ä¸€ä¸ªäº¤æ˜“åœºæ‰€çš„æ•°æ®æœåŠ¡
        * @param exName
        * @return
        * @throws Exception

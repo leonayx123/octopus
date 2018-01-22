@@ -1,4 +1,4 @@
-package com.sdyc.service.wallet;
+ï»¿package com.sdyc.service.wallet;
 
 import com.sdyc.beans.IcoAccount;
 import com.sdyc.dto.AccUserBtcDTO;
@@ -12,7 +12,7 @@ import java.util.List;
  * Date:        2018/1/20  17:54
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
- * Company:     ÉÂÎ÷Ê¶´úÔË³ïĞÅÏ¢¿Æ¼¼ÓĞÏŞ¹«Ë¾
+ * Company:     é™•è¥¿è¯†ä»£è¿ç­¹ä¿¡æ¯ç§‘æŠ€æœ‰é™å…¬å¸
  * Discription:
  *
  * Modify:      2018/1/20  17:54
@@ -23,20 +23,20 @@ import java.util.List;
 public interface WalletService {
 
     /**
-     * É¾³ıÓÃ»§Êı¾İ
+     * åˆ é™¤ç”¨æˆ·æ•°æ®
      * @throws Exception
      */
     public  void  deleteUserDate(String userId) throws Exception;
 
     /**
-     * Ìí¼ÓÓÃ»§¹Ø×¢µÄ±Ò¶ÔµÄĞÅÏ¢
+     * æ·»åŠ ç”¨æˆ·å…³æ³¨çš„å¸å¯¹çš„ä¿¡æ¯
      * @param coins
      * @throws Exception
      */
     public void addUserExSetting(String userId, String  coins,String exNames)throws Exception;
 
     /**
-     * »ñÈ¡ÓÃ»§µÄ±Ò¶ÔÊı¾İ
+     * è·å–ç”¨æˆ·çš„å¸å¯¹æ•°æ®
      * @param userId
      * @return
      * @throws Exception
@@ -46,14 +46,14 @@ public interface WalletService {
 
 
     /**
-     * Ìí¼ÓÓÃ»§½»Ò×ËùµÄÊı¾İ
+     * æ·»åŠ ç”¨æˆ·äº¤æ˜“æ‰€çš„æ•°æ®
      * @throws Exception
      */
     public  void  addUserExData(List<IcoAccount> accounts,String[]icons) throws Exception;
 
 
     /**
-     * ²éÑ¯ÓÃ»§µÄ×ÜÕËºÅÊı¾İ
+     * æŸ¥è¯¢ç”¨æˆ·çš„æ€»è´¦å·æ•°æ®
      * @param userId
      * @return
      * @throws Exception
@@ -62,14 +62,14 @@ public interface WalletService {
 
 
     /**
-     * ²éÑ¯ÓÃ»§µÄµ¥¸öexchangeÕËºÅÊı¾İ
+     * æŸ¥è¯¢ç”¨æˆ·çš„å•ä¸ªexchangeè´¦å·æ•°æ®
      * @param userId
      * @return
      * @throws Exception
      */
     public  IcoAccount getExAccount(String userId,String exchange)throws Exception;
     /**
-     * ĞŞ¸ÄÓÃ»§µÄÄ³¸öex µÄcoinÖµ
+     * ä¿®æ”¹ç”¨æˆ·çš„æŸä¸ªex çš„coinå€¼
      * @param userId
      * @param coinId
      * @param amt
@@ -78,7 +78,7 @@ public interface WalletService {
 
 
     /**
-     * ĞŞ¸ÄÓÃ»§µÄÄ³¸öex µÄcoinÖµ
+     * ä¿®æ”¹ç”¨æˆ·çš„æŸä¸ªex çš„coinå€¼
      * @param userId
      * @param cps
      * @param datas

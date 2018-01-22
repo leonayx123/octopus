@@ -18,6 +18,18 @@ public class RecordBtcAddDTO {
     private BigDecimal addRatio;
     private Timestamp time;
 
+    public RecordBtcAddDTO(){
+
+    }
+
+    public RecordBtcAddDTO(AccUserBtcDTO accUserBtcDTO){
+        this.setInitBtc(accUserBtcDTO.getInitBtc());
+        this.setInvestBtc(accUserBtcDTO.getInvestBtc());
+        this.setCurrBtc(accUserBtcDTO.getCurrBtc());
+        this.setAddRatio(new BigDecimal(accUserBtcDTO.getAddRatio()) );
+        this.setUserId(accUserBtcDTO.getUserId());
+    }
+
     @Id
     @Column(name = "seqkey")
     public long getSeqkey() {

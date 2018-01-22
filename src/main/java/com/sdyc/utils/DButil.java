@@ -684,10 +684,9 @@ public class DButil {
      * 插入数据并获得主键生成器
      * @param o
      * @param jdbcTemplate
-     * @param whereSql
      * @return
      */
-    public static KeyHolder insertReturnPk(Object o, JdbcTemplate jdbcTemplate,String whereSql){
+    public static KeyHolder insertReturnPk(String tableName, Object o, JdbcTemplate jdbcTemplate){
         final ArrayList<Object> objectArray = new ArrayList<Object>();
         KeyHolder keyHolder = new GeneratedKeyHolder();
         Class<?> clazz = o.getClass();
@@ -713,9 +712,7 @@ public class DButil {
             insertSql = insertSql.delete(insertSql.length() - 1, insertSql.length());
             valuesSql = valuesSql.delete(valuesSql.length() - 1, valuesSql.length()).append(")");
             insertSql.append(")").append(" values ").append(valuesSql.toString());
-            if (StringUtils.isNotBlank(whereSql)) {
-                insertSql.append(" ").append(whereSql);
-            }
+
             log.debug(insertSql.toString());
             if(objectArray.size()<=0) {
                 return null;

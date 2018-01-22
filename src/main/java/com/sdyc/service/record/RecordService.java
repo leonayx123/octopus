@@ -1,8 +1,8 @@
 ﻿package com.sdyc.service.record;
 
-import com.sdyc.beans.TradeRecordBean;
 import com.sdyc.dto.RecordBtcAddDTO;
 import com.sdyc.dto.RecordTradeTurnoverDTO;
+import com.sdyc.dto.RecordWalletSpotDTO;
 
 /**
  * <pre>
@@ -27,7 +27,7 @@ public interface RecordService {
      * @param tradeTurnover
      * @return
      */
-    public TradeRecordBean saveTradeRecord(RecordTradeTurnoverDTO tradeTurnover) throws Exception ;
+    public RecordTradeTurnoverDTO saveTradeRecord(RecordTradeTurnoverDTO tradeTurnover) throws Exception ;
 
 
 
@@ -37,6 +37,14 @@ public interface RecordService {
      * @param
      * @return
      */
-    public TradeRecordBean saveTradeRecord(RecordBtcAddDTO recordBtcAdd) throws Exception ;
+    public RecordBtcAddDTO saveBtcAddRecord(RecordBtcAddDTO recordBtcAdd) throws Exception ;
+
+    /**
+     * 保存钱包快照数据
+     * @param spotDTO
+     * @return
+     * @throws Exception
+     */
+    public RecordWalletSpotDTO saveWalletSpotRecord(RecordWalletSpotDTO spotDTO) throws Exception ;
 
 }

@@ -6,7 +6,7 @@ package com.sdyc.beans;
  * Date:        2018/1/16  19:17
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
- * Company:     陕西识代运筹信息科技有限公司
+ * Company:
  * Discription:
  *
  * Modify:      2018/1/16  19:17

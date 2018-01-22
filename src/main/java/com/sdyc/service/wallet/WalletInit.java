@@ -1,4 +1,4 @@
-package com.sdyc.service.wallet;
+ï»¿package com.sdyc.service.wallet;
 
 import com.sdyc.beans.IcoAccount;
 import com.sdyc.beans.PriceBean;
@@ -18,7 +18,7 @@ import java.util.TreeMap;
  * Date:        2018/1/19  15:32
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
- * Company:     ÉÂÎ÷Ê¶´úÔË³ïĞÅÏ¢¿Æ¼¼ÓĞÏŞ¹«Ë¾
+ * Company:     é™•è¥¿è¯†ä»£è¿ç­¹ä¿¡æ¯ç§‘æŠ€æœ‰é™å…¬å¸
  * Discription:
  *
  * Modify:      2018/1/19  15:32
@@ -41,7 +41,7 @@ public class WalletInit {
 
             TreeMap<String,IcoAccount> accMap= initWallet( btcNum,exchanes,iconCpls );
 
-            //ÏÈÇå³ıÀúÊ·Êı¾İ
+            //å…ˆæ¸…é™¤å†å²æ•°æ®
             walletService.deleteUserDate(userId);
 
 
@@ -68,7 +68,7 @@ public class WalletInit {
 
     }
     /**
-     * ³õÊ¼»¯Ç®°üÊı¾İ.  ¸ù¾İ´«ÈëµÄ
+     * åˆå§‹åŒ–é’±åŒ…æ•°æ®.  æ ¹æ®ä¼ å…¥çš„
      * @param btcNum
      * @param exchanes
      * @param iconCpls
@@ -83,7 +83,7 @@ public class WalletInit {
          *  4       2
          *  5       2
          */
-        //ÏÈ³õÊ¼»¯ËùÓĞµÄx½»Ò×ËùµÄbeanÓÃÀ´´æ·ÅÊı¾İ
+        //å…ˆåˆå§‹åŒ–æ‰€æœ‰çš„xäº¤æ˜“æ‰€çš„beanç”¨æ¥å­˜æ”¾æ•°æ®
         TreeMap<String,IcoAccount>  accountTreeMap=new TreeMap<String,IcoAccount>();
         try {
 
@@ -100,13 +100,13 @@ public class WalletInit {
                 accountTreeMap.put(exName, account);
             }
 
-            //°Ñ×Ü±ÒÊıÒª¸ø¸÷¸öex ºÍ coin
-            //ÏÈ³ıÒÔ±ÒÊı  µÃµ½ Ò»¸ö±Ò ¸øËùÓĞµÄ½»Ò×¾ù·ÖÓĞ¶àÉÙ¸ö
+            //æŠŠæ€»å¸æ•°è¦ç»™å„ä¸ªex å’Œ coin
+            //å…ˆé™¤ä»¥å¸æ•°  å¾—åˆ° ä¸€ä¸ªå¸ ç»™æ‰€æœ‰çš„äº¤æ˜“å‡åˆ†æœ‰å¤šå°‘ä¸ª
             Double oneCoinAllex=btcNum/iconCpls.length;
 
 
-            //ÔÙÅĞ¶Ï½»Ò×Ëù ÓĞÃ»ÓĞÕâ¸ö±ÒµÄ½»Ò×. Ã»ÓĞµÄ»° ²»¸øËû·ÖÁË
-            //°ÑÓĞµÄ¼¸¼ÒÔÙ¼ÆÊı È»ºó¾ù·Ö.
+            //å†åˆ¤æ–­äº¤æ˜“æ‰€ æœ‰æ²¡æœ‰è¿™ä¸ªå¸çš„äº¤æ˜“. æ²¡æœ‰çš„è¯ ä¸ç»™ä»–åˆ†äº†
+            //æŠŠæœ‰çš„å‡ å®¶å†è®¡æ•° ç„¶åå‡åˆ†.
 
             for(int e=0;e<iconCpls.length;e++ ) {
 
@@ -118,13 +118,13 @@ public class WalletInit {
 
                     String exName = exchanes[i];
 
-                    //Èç¹ûÊÇbtc Ö±½Ó¾ù·Ö...ÕâÊÇÃª¶¨±Ò
+                    //å¦‚æœæ˜¯btc ç›´æ¥å‡åˆ†...è¿™æ˜¯é”šå®šå¸
                     if (icon.equals("btc")) {
                         hasThisCoinExs.add(exName);
                     } else {
                         DataService exDaservice = factory.getService(exName);
                         String exCp = exDaservice.getExchangeCp(icon);
-                        //µ÷ÓÃÃ¿Ò»¼ÒexµÄÊı¾İ·şÎñ È¡ËûÃÇ¼ÒµÄ±Ò¶Ô. Èç¹ûÓĞµÄ»° ²ÅĞèÒª¸øËû·Ö.
+                        //è°ƒç”¨æ¯ä¸€å®¶exçš„æ•°æ®æœåŠ¡ å–ä»–ä»¬å®¶çš„å¸å¯¹. å¦‚æœæœ‰çš„è¯ æ‰éœ€è¦ç»™ä»–åˆ†.
                         if (StringUtils.isNotBlank(exCp) && !exCp.equals("NULL")) {
                             hasThisCoinExs.add(exName);
                         }
@@ -133,8 +133,8 @@ public class WalletInit {
                 }
 
 
-                //°ÑÓĞÕâ¸ö±ÒµÄexÊıÁ¿»ñÈ¡µ½ . Èç¹ûÊıÁ¿Ğ¡ÓÚÁ½¼Ò.ÔòÌø³ö ËµÃ÷Õâ¸ö±Ò²»ÄÜÓÃ×÷Ë«±ß½»Ò×
-                //Ç®°ü¾ÍÃ»·¨Õı³£³õÊ¼»¯..Ö±½ÓÅ×Òì³£
+                //æŠŠæœ‰è¿™ä¸ªå¸çš„exæ•°é‡è·å–åˆ° . å¦‚æœæ•°é‡å°äºä¸¤å®¶.åˆ™è·³å‡º è¯´æ˜è¿™ä¸ªå¸ä¸èƒ½ç”¨ä½œåŒè¾¹äº¤æ˜“
+                //é’±åŒ…å°±æ²¡æ³•æ­£å¸¸åˆå§‹åŒ–..ç›´æ¥æŠ›å¼‚å¸¸
                 if(hasThisCoinExs.size()<2){
                     System.out.print("this iocn ["+icon+"], there is not has more than 2 ex got it's buniess " );
 
@@ -142,18 +142,18 @@ public class WalletInit {
 
                 }
 
-                //Ê£ÓàÓĞÕâ¸ö±ÒµÄex ÄÜ¸÷×Ô·Ö¶àÉÙ..ÓÃÃ¿±Ò×ÜbtcÁ¿ ³ıÒÔÓĞ±ÒµÄexµÄ¸ñÊ½
+                //å‰©ä½™æœ‰è¿™ä¸ªå¸çš„ex èƒ½å„è‡ªåˆ†å¤šå°‘..ç”¨æ¯å¸æ€»btcé‡ é™¤ä»¥æœ‰å¸çš„exçš„æ ¼å¼
                 Double everyCoinBtc  =oneCoinAllex/hasThisCoinExs.size();
 
                 for(String hasThisCoinExName :hasThisCoinExs){
 
                    IcoAccount exAccount= accountTreeMap.get(hasThisCoinExName);
-                    //Èç¹ûÊÇbtc Ö±½Ó»»Ëã¼´¿É
+                    //å¦‚æœæ˜¯btc ç›´æ¥æ¢ç®—å³å¯
                     if(icon.equals("btc")){
                         exAccount.setBtc(everyCoinBtc);
                     }else{
-                        //ÆäËû±Ò  ĞèÒª¶Ò»»Ò»ÏÂ.
-                        //ÏÈ²é¶Ò»»ÂÊ
+                        //å…¶ä»–å¸  éœ€è¦å…‘æ¢ä¸€ä¸‹.
+                        //å…ˆæŸ¥å…‘æ¢ç‡
                         PriceBean priceBean=null;
 
                         try {

@@ -2,17 +2,13 @@ package com.sdyc.core;
 
 import com.sdyc.beans.Depth;
 import com.sdyc.beans.IcoAccount;
+import com.sdyc.dto.RecordTradeTurnoverDTO;
 import com.sdyc.service.exapi.ExDataServiceFactory;
 import com.sdyc.service.record.RecordService;
-import com.sdyc.sys.Config;
-import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 /**
@@ -59,7 +55,9 @@ public class TraderCore {
     // 4 : sell failed;
     // 5 : buy failed;
     public  int  doTrade(BuniessDataContext context, Depth[] higherBids, Depth[] lowerAsks, double coinBalanceHigher, double bcoinBalanceLower,String icoCpl,String higherEx,String lowerEx){
-        String filePath= Config.get("log.dir")+"/output";
+
+        //这是交易流水bean
+        RecordTradeTurnoverDTO tradeTurnover=(RecordTradeTurnoverDTO)context.getAttr("tradeTrunover");
 
         double higher_bid_1_val;
         double higher_bid_1_qtty;
@@ -89,10 +87,14 @@ public class TraderCore {
         higher_bid_2_val = higherBids[1].getPrice();
         higher_bid_2_qtty = higherBids[1].getQuanatity();
 
+
+
         lower_ask_1_val = lowerAsks[0].getPrice();
         lower_ask_1_qtty = lowerAsks[0].getQuanatity();
         lower_ask_2_val = lowerAsks[1].getPrice();
         lower_ask_2_qtty = lowerAsks[1].getQuanatity();
+
+
 
         //set a temp value for coinBalanceHigher and bcoinBbalanceLower
         double coinBalanceHigherTemp = 9999;
@@ -103,9 +105,9 @@ public class TraderCore {
         IcoAccount lowIcoAccount=null;
 
         try {
-            highIcoAccount=   context.getUserExAccountData(higherEx);
+            highIcoAccount=   context.getUserExWalletData(higherEx);
 
-            lowIcoAccount=   context.getUserExAccountData(lowerEx);
+            lowIcoAccount=   context.getUserExWalletData(lowerEx);
 
             coinBalanceHigherTemp=highIcoAccount.getIcoValue(icoCpl);
 
@@ -115,11 +117,20 @@ public class TraderCore {
 
         priceDiff1 = (higher_bid_2_val - lower_ask_2_val)/lower_ask_2_val;
 
+
+            //必要的日志信息
+            tradeTurnover.setHigherBidVal1(higher_bid_1_val);
+            tradeTurnover.setHigherBidVal2(higher_bid_2_val);
+            tradeTurnover.setHigherBidVal3(higherBids[2].getPrice());
+            tradeTurnover.setLowerAskVal1(lower_ask_1_val);
+            tradeTurnover.setLowerAskVal2(lower_ask_2_val);
+            tradeTurnover.setLowerAskVal3( lowerAsks[2].getPrice());
+            tradeTurnover.setPriceDiff(priceDiff1);
         if(priceDiff1 < minPriceDiff){
             String str = " price gap too small "+ priceDiff1 * 100 + "%, by" +" bid 2 :" + higher_bid_2_val+" ( bid1 "+higher_bid_1_val+") " + " and ask 2: " + lower_ask_2_val+" ( ask1 "+lower_ask_1_val+")\n";
-            strTxtFile = strTxtFile + str;
             System.out.println(str);
-            FileUtils.write(new File(filePath+"/log.txt"),strTxtFile,true);
+            tradeTurnover.setStatus(0);
+            tradeTurnover.setMsg(" price gap too small "+ priceDiff1 * 100 + "%");
             return 0;
         }
 
@@ -153,21 +164,22 @@ public class TraderCore {
                         ", coinBalanceHigher: " + coinBalanceHigherTemp + ", maxBuyCoinLower: " + bcoinBalanceLowerTemp/lower_ask_2_val + 
                         ", maxTradeValueCoin: " +maxTradableValue/lower_ask_2_val + " . \n" ;
         System.out.println(str1);
-        strTxtFile = strTxtFile + str1;
 
+            tradeTurnover.setMinTradbleQtty(minTradbleQtty);
+            tradeTurnover.setTradeValueBuy(tradeValueBuy);
+            tradeTurnover.setTradeValueSell(tradeValueSell);
 
 
         if (tradeValueBuy < minTradableValue  ){
             String str = " , Tradble value too small as : " + tradeValueBuy + " <  " + minTradableValue + "\n" ;
             System.out.println(str);
-            strTxtFile = strTxtFile + str;
 
-
-            FileUtils.write(new File(filePath+"/log.txt"),strTxtFile,true);
+            tradeTurnover.setMsg(" Tradble value too small as : " + tradeValueBuy + " <  " + minTradableValue );
+            tradeTurnover.setStatus(2);
             return 2;
         }
 
-        // calculate trade value margin
+            // calculate trade value margin
         // !! here I  substract the possible exchange cost. which would be 0.4% at most.
 
         tradeValueMargin = tradeValueSell - tradeValueBuy -
@@ -179,17 +191,15 @@ public class TraderCore {
         String str = "WOW! Possible arbitrage :  "+icoCpl+","+ higherEx +"-->"+lowerEx+"  " + tradeValueMargin + " of selling " + tradeValueSell + " and buying "+ tradeValueBuy +"  of base coin !\n" ;
 
             System.out.println(str);
-            strTxtFile = strTxtFile + str;
 
-
-           FileUtils.write(new File(filePath+"/log.txt"),strTxtFile,true);
+            tradeTurnover.setTradeValueMargin(tradeValueMargin);
+            tradeTurnover.setTradeValueMarginPct(tradeValueMarginPct);
+            tradeTurnover.setMsg(str);
+            tradeTurnover.setStatus(1);
             
 
            Double coinNum= highIcoAccount.getIcoValue(icoCpl);
-
            Double btcNum=  highIcoAccount.getBtc();
-
-
            Double coinNumLow= lowIcoAccount.getIcoValue(icoCpl);
            Double btcNumLow=  lowIcoAccount.getBtc();
 
@@ -208,56 +218,9 @@ public class TraderCore {
             lowIcoAccount.setBtc(btcNumLow);
 
 
-
-
-
-
-
-
-            StringBuffer csvBuffer=new StringBuffer();
-
-            csvBuffer.append(icoCpl)
-                    .append(",").append(sdf.format(new Date()))
-                    .append(",").append(higherEx)
-                    .append(",").append(lowerEx)
-                    .append(",").append(tradeValueMargin)
-                    .append(",").append(tradeValueMarginPct)
-                    .append(",").append(minTradbleQtty)
-                    .append(",").append(tradeValueBuy)
-                    .append(",").append(tradeValueSell)
-                    .append("\n");
-
-
-
-            File outPut=new File(filePath);
-            if(!outPut.exists()){
-                outPut.mkdirs();
-            }
-            File file=new File(filePath, fileNameSdf.format(new Date())+".csv");
-            try {
-                if(!file.exists()){
-                    FileUtils.write(file, "ico couple,date,higherEx,lowerEx,tradeValueMargin,tradeValueMarginPct,minTradbleQtty,tradeValueBuy,tradeValueSell\n", "gb2312", true);
-                }
-
-                FileUtils.write(file, csvBuffer.toString(), "gb2312", true);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            System.out.println(csvBuffer);
-
-
-
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-
-
 
         return 1;
 

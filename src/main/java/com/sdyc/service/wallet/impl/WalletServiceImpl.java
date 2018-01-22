@@ -6,11 +6,11 @@ import com.sdyc.dto.AccUserBtcDTO;
 import com.sdyc.dto.AccUserExSetingDTO;
 import com.sdyc.service.wallet.WalletService;
 import com.sdyc.utils.DButil;
-import junit.framework.Assert;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -286,7 +286,7 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public void updateUserBtc(AccUserBtcDTO userBtc) {
-        Assert.assertNotNull(userBtc.getUserId());
+        Assert.notNull(userBtc.getUserId());
 
         ArrayList<Object> ars=new ArrayList<Object>();
         StringBuffer sql=new StringBuffer(" update acc_user_btc set updateDate =?  ");
