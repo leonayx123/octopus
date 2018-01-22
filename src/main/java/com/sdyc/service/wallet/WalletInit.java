@@ -1,4 +1,4 @@
-﻿package com.sdyc.service.wallet;
+package com.sdyc.service.wallet;
 
 import com.sdyc.beans.IcoAccount;
 import com.sdyc.beans.PriceBean;

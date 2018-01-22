@@ -1,4 +1,4 @@
-﻿package com.sdyc.service.record.impl;
+package com.sdyc.service.record.impl;
 
 import com.sdyc.dto.RecordBtcAddDTO;
 import com.sdyc.dto.RecordTradeTurnoverDTO;
@@ -10,6 +10,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * <pre>
@@ -37,6 +39,7 @@ public class RecordServiceImpl implements RecordService {
      */
     @Override
     public RecordTradeTurnoverDTO saveTradeRecord(RecordTradeTurnoverDTO tradeTurnover) throws Exception {
+        tradeTurnover.setTime(new Timestamp(new Date().getTime()));
         KeyHolder KEY= DButil.insertReturnPk("record_trade_turnover", tradeTurnover, jdbcTemplate);
         tradeTurnover.setSeqkey(KEY.getKey().longValue());
         return tradeTurnover;
@@ -49,6 +52,7 @@ public class RecordServiceImpl implements RecordService {
      */
     @Override
     public RecordBtcAddDTO saveBtcAddRecord(RecordBtcAddDTO recordBtcAdd) throws Exception {
+        recordBtcAdd.setTime(new Timestamp(new Date().getTime()));
         KeyHolder KEY= DButil.insertReturnPk("record_btc_add", recordBtcAdd, jdbcTemplate);
         recordBtcAdd.setSeqkey(KEY.getKey().longValue());
         return recordBtcAdd;
@@ -63,6 +67,7 @@ public class RecordServiceImpl implements RecordService {
      */
     @Override
     public RecordWalletSpotDTO saveWalletSpotRecord(RecordWalletSpotDTO spotDTO) throws Exception {
+        spotDTO.setUpdateDate(new Timestamp(new Date().getTime()));
         KeyHolder key= DButil.insertReturnPk("record_wallet_spot", spotDTO, jdbcTemplate);
         spotDTO.setSeqkey(key.getKey().longValue());
         return  spotDTO;

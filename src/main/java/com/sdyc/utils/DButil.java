@@ -49,7 +49,7 @@ public class DButil {
         for (String rep : reps) {
             s = s.replace(rep, "");
         }
-        s = replaceCapital(s);
+       // s = replaceCapital(s);
         return s;
     }
 
@@ -59,17 +59,18 @@ public class DButil {
     }
     //替换大写形式的字段命名
     public static String replaceCapital(String s){
-        char[] chars = s.toCharArray();
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < chars.length; i++) {
-            char ichar = chars[i];
-            if (ichar >= 'A' && ichar <= 'Z') {
-                sb.append("_").append(String.valueOf(ichar).toLowerCase());
-            }else{
-                sb.append(ichar);
-            }
-        }
-        return sb.toString();
+        //char[] chars = s.toCharArray();
+        //StringBuffer sb = new StringBuffer();
+        //for (int i = 0; i < chars.length; i++) {
+        //    char ichar = chars[i];
+        //    if (ichar >= 'A' && ichar <= 'Z') {
+        //        sb.append("_").append(String.valueOf(ichar).toLowerCase());
+        //    }else{
+        //        sb.append(ichar);
+        //    }
+        //}
+        //return sb.toString();
+        return s;
     }
 
     //判断是否有忽略掉的字段
@@ -694,7 +695,7 @@ public class DButil {
         try {
             StringBuffer valuesSql = new StringBuffer("(");
             String name = clazz.getSimpleName();
-            insertSql.append(replaceDataBaseName(name)).append(" ( ");
+            insertSql.append(tableName).append(" ( ");
             Field[] declaredFields = clazz.getDeclaredFields();
             for (Field declaredField : declaredFields) {
                 String name1 = declaredField.getName();

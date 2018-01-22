@@ -1,4 +1,4 @@
-﻿package com.sdyc.beans;
+package com.sdyc.beans;
 
 /**
  * Created by yangxun on 2018-01-23.

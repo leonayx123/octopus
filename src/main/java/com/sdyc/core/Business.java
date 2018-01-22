@@ -199,14 +199,17 @@ public class Business  {
                  tradeTurnover.setCoinId(cp);
                  tradeTurnover.setHigherEx(higherEx);
                  tradeTurnover.setLowerEx(lowerEx);
-
+                 tradeTurnover.setHighPrice(highPrice);
+                 tradeTurnover.setLowerPrice(lowPrice);
                  context.setAttr("tradeTrunover", tradeTurnover);
                  //传入context. 数据修改都在Contex里操作
                  traderCore.doTrade(context,higherBids,lowerAsks,0,0,cp ,higherEx,lowerEx);
 
+                 recordService.saveTradeRecord(tradeTurnover);
+
 
              } catch (Exception e) {
-                 log.error("traderCore 调用捕获到异常");
+                 log.error("traderCore 调用捕获到异常",e);
                  continue;
              }
 

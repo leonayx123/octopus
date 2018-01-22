@@ -1,4 +1,4 @@
-﻿package com.sdyc.core;
+package com.sdyc.core;
 
 import com.sdyc.beans.ExAccount;
 import com.sdyc.beans.IcoAccount;

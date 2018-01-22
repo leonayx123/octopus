@@ -30,6 +30,12 @@ public class RecordTradeTurnoverDTO {
     private Double tradeValueMarginPct;
     private Timestamp time;
     private String msg;
+    private Double highPrice;
+    private Double lowerPrice;
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
     @Id
     @Column(name = "seqkey")
@@ -259,5 +265,25 @@ public class RecordTradeTurnoverDTO {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    @Basic
+    @Column(name = "highPrice")
+    public Double getHighPrice() {
+        return highPrice;
+    }
+
+    public void setHighPrice(Double highPrice) {
+        this.highPrice = highPrice;
+    }
+
+    @Basic
+    @Column(name = "lowerPrice")
+    public Double getLowerPrice() {
+        return lowerPrice;
+    }
+
+    public void setLowerPrice(Double lowerPrice) {
+        this.lowerPrice = lowerPrice;
     }
 }
