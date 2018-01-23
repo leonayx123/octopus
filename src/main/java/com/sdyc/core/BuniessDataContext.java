@@ -55,7 +55,7 @@ public class BuniessDataContext {
             ExAccount exAccount=new ExAccount();
             exAccount.setExchangeId(userExchangeDTO.getExchangeId());
             exAccount.setKey(userExchangeDTO.getKey());
-            exAccount.setSecret(exAccount.getSecret());
+            exAccount.setSecret(userExchangeDTO.getSecert());
 
             this.exAccountMap.put(userExchangeDTO.getExchangeId(),exAccount);
         }

@@ -10,6 +10,8 @@ import com.sdyc.service.exapi.ExDataServiceFactory;
 import com.sdyc.service.record.RecordService;
 import com.sdyc.service.wallet.CmdAdjustService;
 import com.sdyc.service.wallet.WalletService;
+import com.sdyc.sys.Config;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
@@ -45,6 +47,9 @@ public class Business  {
     TraderCore traderCore;
 
     @Resource
+    TraderCoreSim traderCoreSim;
+
+    @Resource
     WalletService walletService;
 
     @Resource
@@ -69,7 +74,13 @@ public class Business  {
     //实际工作的业务逻辑
     public void  doWork(){
 
-        String userId="1mil10coins";
+        String userId= Config.get("sys.userId");
+
+        if(StringUtils.isBlank(userId)){
+           log.error("用户id是null");
+            return;
+
+        }
 
         AccUserExSetingDTO userExSetingDTO=null;
         BuniessDataContext context=null;
@@ -203,7 +214,13 @@ public class Business  {
                  tradeTurnover.setLowerPrice(lowPrice);
                  context.setAttr("tradeTrunover", tradeTurnover);
                  //传入context. 数据修改都在Contex里操作
-                 traderCore.doTrade(context,higherBids,lowerAsks,0,0,cp ,higherEx,lowerEx);
+                 int rs=0;
+                 if(Config.get("sys.simulation").equals("true")){
+                     rs=traderCoreSim.doTrade(context,higherBids,lowerAsks,0,0,cp ,higherEx,lowerEx);
+                 }else {
+                     rs= traderCore.doTrade(context,higherBids,lowerAsks,0,0,cp ,higherEx,lowerEx);
+                 }
+                 tradeTurnover.setStatus(rs);
 
                  recordService.saveTradeRecord(tradeTurnover);
 

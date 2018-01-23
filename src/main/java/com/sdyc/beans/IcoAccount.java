@@ -10,7 +10,7 @@ import java.util.Date;
  * Date:        2018/1/18  18:14
  * Email:       yangxun@nowledgedata.com.cn
  * Version      V1.0
- * Company:     陕西识代运筹信息科技有限公司
+ * Company:     锟斤拷锟斤拷识锟斤拷锟剿筹拷锟斤拷息锟狡硷拷锟斤拷锟睫癸拷司
  * Discription:
  *
  * Modify:      2018/1/18  18:14
@@ -52,6 +52,12 @@ public class IcoAccount {
     Double omg=0.0;
     Double usdt=0.0;
 
+    Double bcd =0.0;
+    Double bcx =0.0;
+    Double btm =0.0;
+    Double zec =0.0;
+
+
     Date   groupDate;
     Date   createDate;
     Date   updateDate;
@@ -65,7 +71,6 @@ public class IcoAccount {
 
     }
 
-    //根据名称 反射获取某个ico的值
     public Double getIcoValue(String cpl)throws Exception{
 
         Method method= this.getClass().getDeclaredMethod("get"+upfs(cpl));
@@ -74,7 +79,6 @@ public class IcoAccount {
 
     }
 
-    //根据名称 反射设置某个ico的值
     public void setIcoValue(String cpl,Double value)throws Exception{
 
         Method method= this.getClass().getDeclaredMethod("set"+upfs(cpl),Double.class);
@@ -83,6 +87,40 @@ public class IcoAccount {
 
     }
 
+
+    public Double getBcd() {
+        return bcd;
+    }
+
+
+
+    public void setBcd(Double bcd) {
+        this.bcd = bcd;
+    }
+
+    public Double getBcx() {
+        return bcx;
+    }
+
+    public void setBcx(Double bcx) {
+        this.bcx = bcx;
+    }
+
+    public Double getBtm() {
+        return btm;
+    }
+
+    public void setBtm(Double btm) {
+        this.btm = btm;
+    }
+
+    public Double getZec() {
+        return zec;
+    }
+
+    public void setZec(Double zec) {
+        this.zec = zec;
+    }
 
     public Date getCreateDate() {
         return createDate;

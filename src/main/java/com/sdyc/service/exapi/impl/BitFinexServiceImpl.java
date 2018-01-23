@@ -11,7 +11,6 @@ import com.sdyc.service.exapi.DataService;
 import com.sdyc.sys.Config;
 import com.sdyc.utils.HttpUtilManager;
 import com.sdyc.utils.JsonUtils;
-import com.sdyc.utils.MD5Util;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.HashMap;
@@ -195,76 +194,24 @@ public class BitFinexServiceImpl implements DataService {
      * get my  all ico balances;
      */
     public AccountBalances getBalances(ExAccount exAccount) throws Exception {
-        String apiUrl="https://api.gate.io/api2/1/private/balances";
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("api_key", exAccount.getKey());
-        String sign = MD5Util.buildMysignV1(params, exAccount.getSecret());
-        params.put("sign", sign);
-
-
-        try {
-            HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-
-            String result = httpUtil.doGateIoRequest("post", apiUrl, params,exAccount.getKey(),exAccount.getSecret() );
-
-            if (StringUtils.isBlank(result)){
-                throw  new Exception("");
-
-            }
-            JSONObject banlance=  JSONObject.parseObject(result);
-            // banlance.getJSONObject();
-            AccountBalances myBalance=new AccountBalances();
-            // myBalance.setFree();
-
-
-        } catch (Exception e) {
-            throw  e;
-        }
 
         return null;
     }
 
 
     public JSONObject buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception{
-        String mycp=  getMyCp(currencyPair);
 
-        String BUY_URL = "https://api.gate.io/api2/1/private/buy";
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("currencyPair", mycp);
-        params.put("rate",String.valueOf(rate) );
-        params.put("amount", String.valueOf(amount));
-
-        HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doGateIoRequest("post", BUY_URL, params,exAccount.getKey(),exAccount.getSecret());
-        System.out.print(result);
-        return JSON.parseObject(result);
+        return null;
     }
 
     public JSONObject sell(ExAccount exAccount,String currencyPair,Double rate, Double amount) throws Exception {
-        String mycp=  getMyCp(currencyPair);
-        String SELL_URL = "https://api.gate.io/api2/1/private/sell";
 
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("currencyPair", mycp);
-        params.put("rate",  String.valueOf(rate));
-        params.put("amount",  String.valueOf(amount));
-
-        HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doGateIoRequest(  "post", SELL_URL, params,exAccount.getKey(),exAccount.getSecret() );
-        System.out.print(result);
-        return JSON.parseObject(result);
+        return null;
     }
 
     public JSONObject getOrder(ExAccount exAccount,String orderNumber, String currencyPair) throws Exception {
-        String mycp=  getMyCp(currencyPair);
-        String GETORDER_URL="https://api.gate.io/api2/1/private/getOrder";
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("orderNumber", orderNumber);
-        params.put("currencyPair", mycp);
-        HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doGateIoRequest( "post", GETORDER_URL, params,exAccount.getKey(),exAccount.getSecret() );
-        //System.out.print(result);
-        return JSON.parseObject(result);
+
+        return null;
     }
 }

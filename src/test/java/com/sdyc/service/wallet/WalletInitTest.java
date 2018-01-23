@@ -1,11 +1,15 @@
 package com.sdyc.service.wallet;
 
+import com.sdyc.beans.IcoAccount;
+import com.sdyc.dto.AccUserExchangeDTO;
+import com.sdyc.service.account.AccountService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <pre>
@@ -25,16 +29,36 @@ import javax.annotation.Resource;
 public class WalletInitTest {
 
     @Resource
+    AccountService accountService;
+
+    @Resource
     WalletInit  walletInit;
-
     @Test
+    public void testIcoAccountInit(){
+        String userId="litest";
+        Double investBtc=3.54252588;
+        String[]cpls="btc,eth,etc,bch,xrp,iota,bcd,bcx,btg,btm,eos,omg,qtum,zec".split(",");
+        String[]exchanes="okex,gateIo".split(",");
+
+        List<IcoAccount > assc= walletInit.loadAccountFile("litest.csv",userId);
+        walletInit.doInitByIcoAccount(userId,investBtc,cpls,exchanes,assc);
+    }
+//
+
+   @Test
     public void testInitWallet() throws Exception {
-        Double btcnum= 11.23608;
-        String[] exs="okex,gateIo,binance,huobipro,zb".split(",");
-        String[]iconCps="btc,eth,xrp,bch,ada,ltc,xem,xlm,neo,iota".split(",");
+       //String userId="litest";
+       //List<IcoAccount > assc= walletInit.loadAccountFile("litest.csv",userId);
 
+       List<AccUserExchangeDTO> exs= accountService.getUserExchanges("litest");
 
-        walletInit.doInit("1mil10coins",btcnum,exs,iconCps);
+       System.out.print(exs.size());
+        //Double btcnum= 11.23608;
+        //String[] exs="okex,gateIo,binance,huobipro,zb".split(",");
+        //String[]iconCps="btc,eth,xrp,bch,ada,ltc,xem,xlm,neo,iota".split(",");
+        //
+        //
+        //walletInit.doInit("1mil10coins",btcnum,exs,iconCps);
 
 //        TreeMap<String,IcoAccount> accountTreeMap= walletInit.initWallet(btcnum,exs,iconCps);
 //

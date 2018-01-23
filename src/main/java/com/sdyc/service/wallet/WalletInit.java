@@ -4,12 +4,16 @@ import com.sdyc.beans.IcoAccount;
 import com.sdyc.beans.PriceBean;
 import com.sdyc.service.exapi.DataService;
 import com.sdyc.service.exapi.ExDataServiceFactory;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TreeMap;
 
 /**
@@ -33,6 +37,69 @@ public class WalletInit {
 
     @Resource
     WalletService walletService;
+
+
+    /**
+     * 对resource/data目录下的文件进行加载
+     * @param fileName
+     * @return
+     */
+    public List<IcoAccount> loadAccountFile(String fileName,String userId){
+        String filePath=this.getClass().getResource("/data").getPath()+"/"+fileName;
+        ArrayList <IcoAccount>  accs=new ArrayList<>();
+        try {
+            List<String> datas= FileUtils.readLines(new File(filePath), "gb2312");
+            String[] cps=datas.get(0).toLowerCase().split(",");
+            for(int i=1;i<datas.size();i++){
+                //一行是一个交易所
+                IcoAccount icoAccount=new IcoAccount();
+                String[] coins=datas.get(i).split(",");
+                icoAccount.setExchange(coins[0]);
+                icoAccount.setUserId(userId);
+
+                accs.add(icoAccount);
+
+                //每一列是币值
+                for(int j=1;j<coins.length;j++){
+                    try {
+                        icoAccount.setIcoValue(cps[j] ,Double.parseDouble(coins[j].trim()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return accs;
+
+    }
+    /**
+     * 根据已有的icon信息初始化
+     * @param userId
+     * @param icoAccounts
+     */
+    public void doInitByIcoAccount(String userId,Double investBtc,String[] iconCpls,String[]exchanes,List<IcoAccount> icoAccounts){
+        try {
+            //先清除历史数据
+            walletService.deleteUserDate(userId);
+            walletService.addUserExSetting(userId, StringUtils.join(iconCpls,",")  , StringUtils.join(exchanes,","));
+
+            walletService.addUserExData(icoAccounts,iconCpls);
+            Double initBtc=0.0;
+            for(IcoAccount icoAccount:icoAccounts){
+                initBtc=initBtc+icoAccount.getBtc();
+
+            }
+
+            walletService.addUserBtc(userId,investBtc,initBtc,initBtc);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public void  doInit(String userId, Double btcNum,String[] exchanes,String[] iconCpls ){

@@ -87,7 +87,7 @@ public interface WalletService {
 
     public AccUserBtcDTO getUserBtc(String userid);
 
-    public void  addUserBtc(String userId,Double amt1,Double amt2,Double amt3);
+    public void  addUserBtc(String userId,Double investBtc,Double initBtc,Double currBtc);
 
     public void  updateUserBtc(AccUserBtcDTO userBtc);
 }

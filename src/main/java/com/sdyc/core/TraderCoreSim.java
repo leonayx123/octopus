@@ -1,15 +1,10 @@
 package com.sdyc.core;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.sdyc.beans.Depth;
-import com.sdyc.beans.ExAccount;
 import com.sdyc.beans.IcoAccount;
 import com.sdyc.dto.RecordTradeTurnoverDTO;
-import com.sdyc.service.exapi.DataService;
 import com.sdyc.service.exapi.ExDataServiceFactory;
 import com.sdyc.service.record.RecordService;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
@@ -35,10 +30,10 @@ import java.text.SimpleDateFormat;
  *
  * </pre>
  */
-@Component("traderCore")
-public class TraderCore {
+@Component("traderCoreSim")
+public class TraderCoreSim {
 
-    Log log= LogFactory.getLog(TraderCore.class);
+    Log log= LogFactory.getLog(TraderCoreSim.class);
 
     @Resource
     private ExDataServiceFactory exServiceFactory;
@@ -207,37 +202,7 @@ public class TraderCore {
             tradeTurnover.setMsg(str);
             tradeTurnover.setStatus(1);
 
-            DataService higherExService=exServiceFactory.getService(higherEx);
-            DataService lowerExService=exServiceFactory.getService(lowerEx);
 
-            ExAccount highExAccount= context.getExchangeAccount(higherEx);
-            ExAccount lowerhighExAccount= context.getExchangeAccount(lowerEx);
-            if(highExAccount==null|| StringUtils.isBlank(highExAccount.getKey())||StringUtils.isBlank(highExAccount.getSecret())){
-                log.error("sell 失败 没有设置key");
-                return 4 ;
-            }
-            if(lowerhighExAccount==null|| StringUtils.isBlank(lowerhighExAccount.getKey())||StringUtils.isBlank(lowerhighExAccount.getSecret())){
-                log.error("buy 失败 没有设置key");
-                return 5 ;
-            }
-
-            try {
-                //sell  by  high  value 2
-                JSONObject res= higherExService.sell(highExAccount, icoCpl, higher_bid_2_val, minTradbleQtty);
-                log.info("\n$$$$$$$ sell "+higherEx+"=cp=>"+icoCpl+"=bidval=>"+higher_bid_2_val+"=qtty=>"+minTradbleQtty+"  $$$$$$$$$$ \n"+ JSON.toJSON(res));
-            } catch (Exception e) {
-                log.error("sell 失败",e);log.error("sell 失败",e);
-                return  4;
-            }
-            try {
-                //
-                JSONObject res2=  lowerExService.buy(lowerhighExAccount, icoCpl, lower_ask_2_val, minTradbleQtty);
-                log.info("\n$$$$$$$ buy "+lowerEx+"<=cp="+icoCpl+" <=bidval="+lower_ask_2_val+"<=qtty= "+minTradbleQtty+"  $$$$$$$$$$ \n"+ JSON.toJSON(res2));
-
-            } catch (Exception e) {
-                log.error("buy 失败",e);
-                return  5;
-            }
 
             Double coinNum= highIcoAccount.getIcoValue(icoCpl);
            Double btcNum=  highIcoAccount.getBtc();

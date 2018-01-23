@@ -50,13 +50,15 @@ public class WalletServiceImpl implements WalletService {
 
         String sql="delete from acc_user_exchange where userId=? ";
         String sql2="delete from acc_coin_balance where userId=? ";
-        String sql3="delete from acc_excoin_spot where userId=? ";
-        String sql4="delete from acc_user_coins where userId=? ";
+        //String sql3="delete from acc_excoin_spot where userId=? ";
+        String sql4="delete from acc_user_ex_seting where userId=? ";
+        String sql5="delete from acc_user_btc where userId=? ";
 
         jdbcTemplate.update(sql,userId);
         jdbcTemplate.update(sql2,userId);
-        jdbcTemplate.update(sql3,userId);
+        //jdbcTemplate.update(sql3,userId);
         jdbcTemplate.update(sql4,userId);
+        jdbcTemplate.update(sql5,userId);
 
     }
 
