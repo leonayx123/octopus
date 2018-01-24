@@ -273,7 +273,11 @@ public class OkexServiceImpl implements DataService {
                 Iterator<String> itfz= freezedJson.keySet().iterator();
                 while (itfz.hasNext()){
                     String key=itfz.next();
-                    lock.put(key.trim().toLowerCase(),Double.parseDouble(freezedJson.getString(key)));
+                    String value=freezedJson.getString(key);
+                    if(value.equals("0")||!StringUtils.isNumeric(value)){
+                        continue;
+                    }
+                    lock.put(key.trim().toLowerCase(),Double.parseDouble(value));
                 }
 
             }
@@ -317,7 +321,13 @@ public class OkexServiceImpl implements DataService {
 
         JSONObject resJson=  JSON.parseObject(tradeResult);
         ApiTradeResult  apiTradeResult=new ApiTradeResult();
-        apiTradeResult.setSuccess(resJson.getBoolean("result"));
+        Boolean success=resJson.getBoolean("result");
+        if(success==null){
+            apiTradeResult.setSuccess(false);
+        }else {
+            apiTradeResult.setSuccess(success);
+        }
+
         if(apiTradeResult.getSuccess()){
             apiTradeResult.setOrderId(resJson.getString("order_id"));
         }

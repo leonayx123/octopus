@@ -108,6 +108,7 @@ public class Business  {
            AccountBalances gateIoBalances=  exServiceFactory.getService("gateIo").getBalances(context.getExchangeAccount("gateIo"));
 
             if(gateIoBalances.getLock()!=null&&gateIoBalances.getLock().size()>0){
+                log.error(" gateIo  is locak");
                 for(int i=1;i<=3;i++){
                     Thread.sleep(30000);
                     gateIoBalances=  exServiceFactory.getService("gateIo").getBalances(context.getExchangeAccount("gateIo"));
@@ -127,6 +128,7 @@ public class Business  {
            AccountBalances  okexBalances=  exServiceFactory.getService("okex").getBalances(context.getExchangeAccount("okex"));
 
             if(okexBalances.getLock()!=null&&okexBalances.getLock().size()>0){
+                log.error(" okex  is locak");
                 for(int i=1;i<=3;i++){
                     Thread.sleep(30000);
                     okexBalances=  exServiceFactory.getService("okex").getBalances(context.getExchangeAccount("okex"));
@@ -262,13 +264,15 @@ public class Business  {
                  String simulation= Config.get("sys.simulation");
                  //如果不是模拟状态 才会交易
                  if(simulation.equals("false")){
-                     doExchange(context, JudgeResult);
+                     if(JudgeResult.getStatus()==1){
+                       TradeResult tradeResult=    doExchange(context, JudgeResult);
+                         log.info(tradeResult.toString());
+                     }
 
                  }else {
                      //模拟的啥也不干
                      //do nothing
                  }
-
                  tradeTurnover.setStatus(JudgeResult.getStatus());
 
                  recordService.saveTradeRecord(tradeTurnover);

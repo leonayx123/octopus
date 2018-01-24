@@ -107,4 +107,20 @@ public class TradeResult {
     public void setError(String error) {
         this.error = error;
     }
+
+
+    @Override
+    public String toString() {
+        return "TradeResult{" +
+                "commonRes=" + commonRes +
+                ", sellEx='" + sellEx + '\'' +
+                ", buyEx='" + buyEx + '\'' +
+                ", coinId='" + coinId + '\'' +
+                ", sellRes=" + sellRes +
+                ", sellOrderId='" + sellOrderId + '\'' +
+                ", buyRes=" + buyRes +
+                ", bugOrderId='" + bugOrderId + '\'' +
+                ", error='" + error + '\'' +
+                '}';
+    }
 }
