@@ -1,10 +1,7 @@
 package com.sdyc.service.exapi;
 
 import com.alibaba.fastjson.JSONObject;
-import com.sdyc.beans.AccountBalances;
-import com.sdyc.beans.Depth;
-import com.sdyc.beans.ExAccount;
-import com.sdyc.beans.PriceBean;
+import com.sdyc.beans.*;
 
 import java.util.Map;
 
@@ -73,7 +70,7 @@ public interface DataService {
      * @return
      * @throws Exception
      */
-    public JSONObject  buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception;
+    public ApiTradeResult buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception;
 
 
     /**
@@ -84,7 +81,7 @@ public interface DataService {
      * @return
      * @throws Exception
      */
-    public JSONObject sell(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws  Exception;
+    public ApiTradeResult sell(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws  Exception;
 
 
     public JSONObject getOrder(ExAccount exAccount,String orderNumber,String currencyPair) throws Exception;

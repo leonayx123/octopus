@@ -1,8 +1,7 @@
 package com.sdyc.core;
 
-import com.sdyc.beans.Depth;
-import com.sdyc.beans.IcoAccount;
-import com.sdyc.beans.PriceBean;
+import com.alibaba.fastjson.JSON;
+import com.sdyc.beans.*;
 import com.sdyc.dto.*;
 import com.sdyc.service.account.AccountService;
 import com.sdyc.service.exapi.DataService;
@@ -87,6 +86,8 @@ public class Business  {
         //这是记录交易日志的
         RecordTradeTurnoverDTO tradeTurnover=null;
         try {
+
+
             //开始调用 币数修改任务.进行币数调整
             cmdAdjustService.doAllCmds();
 
@@ -96,10 +97,50 @@ public class Business  {
             //获取用户的账号信息
             List<AccUserExchangeDTO>  userExchanges=  accountService.getUserExchanges(userId);
 
-            context=new BuniessDataContext(accounts,userExchanges);
+            context=new BuniessDataContext(userId,accounts,userExchanges);
 
             //查询用户的btc信息
             userExSetingDTO= walletService.getUserExSetting(userId);
+
+
+            //同步用户远程真实的账号信息
+
+           AccountBalances gateIoBalances=  exServiceFactory.getService("gateIo").getBalances(context.getExchangeAccount("gateIo"));
+
+            if(gateIoBalances.getLock()!=null&&gateIoBalances.getLock().size()>0){
+                for(int i=1;i<=3;i++){
+                    Thread.sleep(30000);
+                    gateIoBalances=  exServiceFactory.getService("gateIo").getBalances(context.getExchangeAccount("gateIo"));
+                    if(gateIoBalances.getLock()==null||gateIoBalances.getLock().size()==0){
+                        break;
+                    }else if(i==3){
+                        log.error("gate io account lock so long time "+ StringUtils.join(gateIoBalances.getLock().keySet(),","));
+                        return;
+                    }else if (i<3){
+                        continue;
+                    }
+                }
+
+            }
+
+            //同步用户远程真实的账号信息
+           AccountBalances  okexBalances=  exServiceFactory.getService("okex").getBalances(context.getExchangeAccount("okex"));
+
+            if(okexBalances.getLock()!=null&&okexBalances.getLock().size()>0){
+                for(int i=1;i<=3;i++){
+                    Thread.sleep(30000);
+                    okexBalances=  exServiceFactory.getService("okex").getBalances(context.getExchangeAccount("okex"));
+                    if(okexBalances.getLock()==null||gateIoBalances.getLock().size()==0){
+                        break;
+                    }else if(i==3){
+                        log.error("gate io account lock so long time "+ StringUtils.join(okexBalances.getLock().keySet(),","));
+                        return;
+                    }else if (i<3){
+                        continue;
+                    }
+                }
+
+            }
 
             Assert.notNull(userExSetingDTO);
             Assert.notNull(userExSetingDTO.getUserCoins());
@@ -214,13 +255,21 @@ public class Business  {
                  tradeTurnover.setLowerPrice(lowPrice);
                  context.setAttr("tradeTrunover", tradeTurnover);
                  //传入context. 数据修改都在Contex里操作
-                 int rs=0;
-                 if(Config.get("sys.simulation").equals("true")){
-                     rs=traderCoreSim.doTrade(context,higherBids,lowerAsks,0,0,cp ,higherEx,lowerEx);
+
+
+                 TraderJudgeResult  JudgeResult= traderCore.doTrade(context,higherBids,lowerAsks,0,0,cp ,higherEx,lowerEx);
+
+                 String simulation= Config.get("sys.simulation");
+                 //如果不是模拟状态 才会交易
+                 if(simulation.equals("false")){
+                     doExchange(context, JudgeResult);
+
                  }else {
-                     rs= traderCore.doTrade(context,higherBids,lowerAsks,0,0,cp ,higherEx,lowerEx);
+                     //模拟的啥也不干
+                     //do nothing
                  }
-                 tradeTurnover.setStatus(rs);
+
+                 tradeTurnover.setStatus(JudgeResult.getStatus());
 
                  recordService.saveTradeRecord(tradeTurnover);
 
@@ -264,10 +313,8 @@ public class Business  {
 
             }else if(btc.getCurrBtc().doubleValue()>currBtc) {
                 log.error("WTF !!! curr btc 居然减少了,下面是当前详情!!====> "+currBtc);
-                for(IcoAccount  account: contextAccs){
-                    log.error(account.toString());
-                }
 
+                log.error("对应的 turnover 流水id是:"+tradeTurnover.getSeqkey()+",  msg is :"+tradeTurnover.getMsg());
             }else {
                 log.debug("当前btc 和 上次btc相同 不做记录了 ");
             }
@@ -277,6 +324,79 @@ public class Business  {
            log.error("写buniess日志时出错",e);
         }
 
+
+
+
+    }
+
+
+    /**
+     * 进行交易的业务类. 高卖低买
+     * @param context
+     * @param traderJudgeResult
+     * @return
+     * @throws Exception
+     */
+    public TradeResult doExchange(BuniessDataContext context,TraderJudgeResult traderJudgeResult)throws Exception{
+        TradeResult tradeResult =new TradeResult();
+        String higherEx= traderJudgeResult.getHigherEx();
+        String lowerEx= traderJudgeResult.getLowerEx();
+        String coin= traderJudgeResult.getCoinId();
+        Double sellPrice= traderJudgeResult.getSellPrice();
+        Double buyPrice= traderJudgeResult.getBuyPrice();
+        Double quantity= traderJudgeResult.getQuantity();
+
+        DataService higherExService=exServiceFactory.getService(higherEx);
+        DataService lowerExService=exServiceFactory.getService(lowerEx);
+
+        ExAccount highExAccount= context.getExchangeAccount(higherEx);
+        ExAccount lowerExAccount= context.getExchangeAccount(lowerEx);
+
+
+        tradeResult.setCoinId(coin);
+        tradeResult.setBuyEx(lowerEx);
+        tradeResult.setSellEx(higherEx);
+
+
+        if(highExAccount==null|| StringUtils.isBlank(highExAccount.getKey())||StringUtils.isBlank(highExAccount.getSecret())){
+            log.error("sell 失败 没有设置key");
+            tradeResult.setError("sell 失败 没有设置key");
+            tradeResult.setSellRes(false);
+            return tradeResult;
+
+        }
+        if(lowerExAccount==null|| StringUtils.isBlank(lowerExAccount.getKey())||StringUtils.isBlank(lowerExAccount.getSecret())){
+            log.error("buy 失败 没有设置key");
+            tradeResult.setError("buy 失败 没有设置key");
+            tradeResult.setBuyRes(false);
+            return tradeResult;
+        }
+
+
+        try {
+            //sell  by  high  value 2
+            ApiTradeResult res= higherExService.sell(highExAccount, coin, sellPrice, quantity);
+            log.info("\n$$$$$$$ sell "+higherEx+"=coin=>"+coin+"=sellPrice=>"+sellPrice+"=qtty=>"+quantity+"  $$$$$$$$$$ \n"+ JSON.toJSON(res));
+        } catch (Exception e) {
+            log.error("sell 失败",e);
+
+            tradeResult.setError("sell调用接口异常");
+            tradeResult.setSellRes(false);
+            return tradeResult;
+        }
+        try {
+            //
+            ApiTradeResult res2=  lowerExService.buy(lowerExAccount, coin, buyPrice, quantity);
+            log.info("\n$$$$$$$ buy "+lowerEx+"=coin=>"+coin+"=buyPrice=>"+buyPrice+"=qtty=>"+quantity+"  $$$$$$$$$$ \n"+ JSON.toJSON(res2));
+
+        } catch (Exception e) {
+            log.error("buy 失败",e);
+            tradeResult.setError("buy调用接口异常");
+            tradeResult.setBuyRes(false);
+            return tradeResult;
+        }
+
+        return tradeResult;
 
     }
 

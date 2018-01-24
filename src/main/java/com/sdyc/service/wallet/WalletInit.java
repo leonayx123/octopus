@@ -46,7 +46,7 @@ public class WalletInit {
      */
     public List<IcoAccount> loadAccountFile(String fileName,String userId){
         String filePath=this.getClass().getResource("/data").getPath()+"/"+fileName;
-        ArrayList <IcoAccount>  accs=new ArrayList<>();
+        ArrayList <IcoAccount>  accs=new ArrayList<IcoAccount>();
         try {
             List<String> datas= FileUtils.readLines(new File(filePath), "gb2312");
             String[] cps=datas.get(0).toLowerCase().split(",");

@@ -16,6 +16,8 @@ import java.util.Map;
  */
 public class BuniessDataContext {
 
+    private String userId;
+
     private  Map<String,IcoAccount> taskIcoAccounts;
 
     private Map<String,ExAccount> exAccountMap;
@@ -43,7 +45,7 @@ public class BuniessDataContext {
      * @param accs
      * @param userExchangeDTOs
      */
-    BuniessDataContext(List<IcoAccount> accs,List<AccUserExchangeDTO> userExchangeDTOs){
+    BuniessDataContext(String userId, List<IcoAccount> accs,List<AccUserExchangeDTO> userExchangeDTOs){
         this.taskIcoAccounts=new HashMap<String, IcoAccount>();
         for(int  i=0;i< accs.size();i++){
             IcoAccount icoAccount=accs.get(i);
@@ -59,6 +61,11 @@ public class BuniessDataContext {
 
             this.exAccountMap.put(userExchangeDTO.getExchangeId(),exAccount);
         }
+    }
+
+
+    public String getUserId() {
+        return userId;
     }
 
 

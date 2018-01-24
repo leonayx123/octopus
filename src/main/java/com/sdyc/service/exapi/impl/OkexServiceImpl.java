@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.okcoin.rest.stock.IStockRestApi;
 import com.okcoin.rest.stock.impl.StockRestApi;
-import com.sdyc.beans.AccountBalances;
-import com.sdyc.beans.Depth;
-import com.sdyc.beans.ExAccount;
-import com.sdyc.beans.PriceBean;
+import com.sdyc.beans.*;
 import com.sdyc.service.exapi.DataService;
 import com.sdyc.sys.Config;
 import com.sdyc.utils.HttpUtilManager;
@@ -17,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -223,26 +221,74 @@ public class OkexServiceImpl implements DataService {
         IStockRestApi stockPost = new StockRestApi("https://www.okex.com",exAccount.getKey(), exAccount.getSecret());
 
 
-
+        AccountBalances myBalance=new AccountBalances();
 
         try {
             String info  = stockPost.userinfo();
 
-            System.out.print(info);
 
-            AccountBalances myBalance=new AccountBalances();
-            // myBalance.setFree();
+            /**
+             * {
+            "info": {
+                 "funds": {
+                     "free": {
+                         "btc": "0",
+                         "usd": "0",
+                         "ltc": "0",
+                         "eth": "0"
+                     },
+                     "freezed": {
+                             "btc": "0",
+                             "usd": "0",
+                             "ltc": "0",
+                             "eth": "0"
+                        }
+                 }
+             },
+             "result": true
+             }
+             */
 
+           JSONObject infoJson= JSON.parseObject(info).getJSONObject("info");
+           JSONObject funds =   infoJson.getJSONObject("funds");
+
+            JSONObject freeJson=funds.getJSONObject("free");
+
+            JSONObject freezedJson=funds.getJSONObject("freezed");
+
+            HashMap<String,Double> free=null;
+            if(freeJson!=null&&freeJson.size()>0){
+                free=new HashMap<String, Double>();
+                Iterator<String> it= freeJson.keySet().iterator();
+                while(it.hasNext()){
+                    String key=it.next();
+                    free.put(key.trim().toLowerCase(), Double.parseDouble(freeJson.getString(key)) );
+                }
+            }
+
+
+            HashMap<String,Double> lock=null;
+            if(freezedJson!=null&&freezedJson.size()>0){
+                lock=new HashMap<String, Double>();
+                Iterator<String> itfz= freezedJson.keySet().iterator();
+                while (itfz.hasNext()){
+                    String key=itfz.next();
+                    lock.put(key.trim().toLowerCase(),Double.parseDouble(freezedJson.getString(key)));
+                }
+
+            }
+            myBalance.setFree(free);
+            myBalance.setLock(lock);
 
         } catch (Exception e) {
             throw  e;
         }
 
-        return null;
+        return myBalance;
     }
 
 
-    public JSONObject buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception{
+    public ApiTradeResult buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception{
 
 
         String mycp=  getMyCp(currencyPair);
@@ -250,10 +296,18 @@ public class OkexServiceImpl implements DataService {
         //现货下单交易
         String tradeResult = stockPost.trade(mycp, "buy",String.valueOf(rate), String.valueOf(amount));
 
-        return JSON.parseObject(tradeResult);
+
+        JSONObject resJson=  JSON.parseObject(tradeResult);
+        ApiTradeResult  apiTradeResult=new ApiTradeResult();
+        apiTradeResult.setSuccess(resJson.getBoolean("result"));
+        if(apiTradeResult.getSuccess()){
+            apiTradeResult.setOrderId(resJson.getString("order_id"));
+        }
+
+        return apiTradeResult;
     }
 
-    public JSONObject sell(ExAccount exAccount,String currencyPair,Double rate, Double amount) throws Exception {
+    public ApiTradeResult sell(ExAccount exAccount,String currencyPair,Double rate, Double amount) throws Exception {
 
 
         String mycp=  getMyCp(currencyPair);
@@ -261,7 +315,14 @@ public class OkexServiceImpl implements DataService {
         //现货下单交易
         String tradeResult = stockPost.trade(mycp, "sell", String.valueOf(rate), String.valueOf(amount));
 
-        return JSON.parseObject(tradeResult);
+        JSONObject resJson=  JSON.parseObject(tradeResult);
+        ApiTradeResult  apiTradeResult=new ApiTradeResult();
+        apiTradeResult.setSuccess(resJson.getBoolean("result"));
+        if(apiTradeResult.getSuccess()){
+            apiTradeResult.setOrderId(resJson.getString("order_id"));
+        }
+
+        return apiTradeResult;
     }
 
     public JSONObject getOrder(ExAccount exAccount,String orderNumber, String currencyPair) throws Exception {

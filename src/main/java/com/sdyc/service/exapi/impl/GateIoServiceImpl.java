@@ -3,10 +3,7 @@ package com.sdyc.service.exapi.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sdyc.beans.AccountBalances;
-import com.sdyc.beans.Depth;
-import com.sdyc.beans.ExAccount;
-import com.sdyc.beans.PriceBean;
+import com.sdyc.beans.*;
 import com.sdyc.service.exapi.DataService;
 import com.sdyc.sys.Config;
 import com.sdyc.utils.HttpUtilManager;
@@ -16,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -240,7 +238,7 @@ public class GateIoServiceImpl implements DataService{
         String sign = MD5Util.buildMysignV1(params, exAccount.getSecret());
         params.put("sign", sign);
 
-
+        AccountBalances myBalance=new AccountBalances();
         try {
             HttpUtilManager httpUtil = HttpUtilManager.getInstance();
 
@@ -250,21 +248,60 @@ public class GateIoServiceImpl implements DataService{
                 throw  new Exception("没有获取到账号数据");
 
             }
+            /**
+             *  {
+             "result":
+             "true",
+                 "available": {
+                     "BTC": "1000",
+                     "ETH": "968.8",
+                     "ETC": "0",
+                 },
+                 "locked": {
+                     "ETH": "1"
+                 }
+             }
+             */
+
             JSONObject banlance=  JSONObject.parseObject(result);
            // banlance.getJSONObject();
-            AccountBalances myBalance=new AccountBalances();
-           // myBalance.setFree();
+            JSONObject freeJson=banlance.getJSONObject("available");
+
+            JSONObject freezedJson=banlance.getJSONObject("locked");
+
+            HashMap<String,Double> free=null;
+            if(freeJson!=null&&freeJson.size()>0){
+                free=new HashMap<String, Double>();
+                Iterator<String> it= freeJson.keySet().iterator();
+                while(it.hasNext()){
+                    String key=it.next();
+                    free.put(key.trim().toLowerCase(), Double.parseDouble(freeJson.getString(key)) );
+                }
+            }
+
+            HashMap<String,Double> lock=null;
+            if(freezedJson!=null&&freezedJson.size()>0){
+                lock=new HashMap<String, Double>();
+                Iterator<String> itfz= freezedJson.keySet().iterator();
+                while (itfz.hasNext()){
+                    String key=itfz.next();
+                    lock.put(key.trim().toLowerCase(),Double.parseDouble(freezedJson.getString(key)));
+                }
+
+            }
+            myBalance.setFree(free);
+            myBalance.setLock(lock);
 
 
         } catch (Exception e) {
            throw  e;
         }
 
-        return null;
+        return myBalance;
     }
 
 
-    public JSONObject buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception{
+    public ApiTradeResult buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception{
         String mycp=  getMyCp(currencyPair);
 
         String BUY_URL = "https://api.gate.io/api2/1/private/buy";
@@ -275,11 +312,25 @@ public class GateIoServiceImpl implements DataService{
 
         HttpUtilManager httpUtil = HttpUtilManager.getInstance();
         String result = httpUtil.doGateIoRequest("post", BUY_URL, params,exAccount.getKey(), exAccount.getSecret());
-        System.out.print(result);
-        return JSON.parseObject(result);
+        /**
+         *  {
+         "result":"true",
+         "orderNumber":"123456",
+         "message":"Success"
+          }
+         */
+         JSONObject resJson = JSON.parseObject(result);
+        ApiTradeResult  apiTradeResult=new ApiTradeResult();
+        apiTradeResult.setSuccess(Boolean.parseBoolean(resJson.getString("result")));
+        apiTradeResult.setMsg(resJson.getString("message"));
+        if(apiTradeResult.getSuccess()){
+            apiTradeResult.setOrderId(resJson.getString("orderNumber"));
+        }
+
+        return apiTradeResult;
     }
 
-    public JSONObject sell(ExAccount exAccount,String currencyPair,Double rate, Double amount) throws Exception {
+    public ApiTradeResult sell(ExAccount exAccount,String currencyPair,Double rate, Double amount) throws Exception {
         String mycp=  getMyCp(currencyPair);
         String SELL_URL = "https://api.gate.io/api2/1/private/sell";
 
@@ -290,8 +341,16 @@ public class GateIoServiceImpl implements DataService{
 
         HttpUtilManager httpUtil = HttpUtilManager.getInstance();
         String result = httpUtil.doGateIoRequest("post", SELL_URL, params,exAccount.getKey(), exAccount.getSecret());
-        System.out.print(result);
-        return JSON.parseObject(result);
+
+        JSONObject resJson=  JSON.parseObject(result);
+        ApiTradeResult  apiTradeResult=new ApiTradeResult();
+        apiTradeResult.setSuccess(Boolean.parseBoolean(resJson.getString("result")));
+        apiTradeResult.setMsg(resJson.getString("message"));
+        if(apiTradeResult.getSuccess()){
+            apiTradeResult.setOrderId(resJson.getString("orderNumber"));
+        }
+
+        return apiTradeResult;
     }
 
     public JSONObject getOrder(ExAccount exAccount,String orderNumber, String currencyPair) throws Exception {

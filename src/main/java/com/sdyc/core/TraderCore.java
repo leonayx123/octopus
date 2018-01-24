@@ -1,21 +1,18 @@
 package com.sdyc.core;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.sdyc.beans.Depth;
-import com.sdyc.beans.ExAccount;
 import com.sdyc.beans.IcoAccount;
+import com.sdyc.beans.TraderJudgeResult;
 import com.sdyc.dto.RecordTradeTurnoverDTO;
-import com.sdyc.service.exapi.DataService;
 import com.sdyc.service.exapi.ExDataServiceFactory;
 import com.sdyc.service.record.RecordService;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -63,7 +60,9 @@ public class TraderCore {
     // 3 : not enough bcoin on lower
     // 4 : sell failed;
     // 5 : buy failed;
-    public  int  doTrade(BuniessDataContext context, Depth[] higherBids, Depth[] lowerAsks, double coinBalanceHigher, double bcoinBalanceLower,String icoCpl,String higherEx,String lowerEx){
+    public TraderJudgeResult doTrade(BuniessDataContext context, Depth[] higherBids, Depth[] lowerAsks, double coinBalanceHigher, double bcoinBalanceLower,String icoCpl,String higherEx,String lowerEx){
+
+        TraderJudgeResult judgeResult=new TraderJudgeResult();
 
         //这是交易流水bean
         RecordTradeTurnoverDTO tradeTurnover=(RecordTradeTurnoverDTO)context.getAttr("tradeTrunover");
@@ -113,7 +112,12 @@ public class TraderCore {
         IcoAccount highIcoAccount=null;
         IcoAccount lowIcoAccount=null;
 
+        judgeResult.setCoinId(icoCpl);
+        judgeResult.setHigherEx(higherEx);
+        judgeResult.setLowerEx(lowerEx);
+        judgeResult.setTimestamp(new Date());
         try {
+
             highIcoAccount=   context.getUserExWalletData(higherEx);
 
             lowIcoAccount=   context.getUserExWalletData(lowerEx);
@@ -125,6 +129,8 @@ public class TraderCore {
 
 
         priceDiff1 = (higher_bid_2_val - lower_ask_2_val)/lower_ask_2_val;
+
+
 
 
             //必要的日志信息
@@ -140,7 +146,9 @@ public class TraderCore {
             System.out.println(str);
             tradeTurnover.setStatus(0);
             tradeTurnover.setMsg(" price gap too small "+ priceDiff1 * 100 + "%");
-            return 0;
+
+            judgeResult.setStatus(0);
+            return judgeResult;
         }
 
 
@@ -185,7 +193,9 @@ public class TraderCore {
 
             tradeTurnover.setMsg(" Tradble value too small as : " + tradeValueBuy + " <  " + minTradableValue );
             tradeTurnover.setStatus(2);
-            return 2;
+
+            judgeResult.setStatus(2);
+            return judgeResult;
         }
 
             // calculate trade value margin
@@ -202,49 +212,17 @@ public class TraderCore {
 
 
 
+
             tradeTurnover.setTradeValueMargin(tradeValueMargin);
             tradeTurnover.setTradeValueMarginPct(tradeValueMarginPct);
             tradeTurnover.setMsg(str);
             tradeTurnover.setStatus(1);
 
-            DataService higherExService=exServiceFactory.getService(higherEx);
-            DataService lowerExService=exServiceFactory.getService(lowerEx);
-
-            ExAccount highExAccount= context.getExchangeAccount(higherEx);
-            ExAccount lowerhighExAccount= context.getExchangeAccount(lowerEx);
-            if(highExAccount==null|| StringUtils.isBlank(highExAccount.getKey())||StringUtils.isBlank(highExAccount.getSecret())){
-                log.error("sell 失败 没有设置key");
-                return 4 ;
-            }
-            if(lowerhighExAccount==null|| StringUtils.isBlank(lowerhighExAccount.getKey())||StringUtils.isBlank(lowerhighExAccount.getSecret())){
-                log.error("buy 失败 没有设置key");
-                return 5 ;
-            }
-
-            try {
-                //sell  by  high  value 2
-                JSONObject res= higherExService.sell(highExAccount, icoCpl, higher_bid_2_val, minTradbleQtty);
-                log.info("\n$$$$$$$ sell "+higherEx+"=cp=>"+icoCpl+"=bidval=>"+higher_bid_2_val+"=qtty=>"+minTradbleQtty+"  $$$$$$$$$$ \n"+ JSON.toJSON(res));
-            } catch (Exception e) {
-                log.error("sell 失败",e);log.error("sell 失败",e);
-                return  4;
-            }
-            try {
-                //
-                JSONObject res2=  lowerExService.buy(lowerhighExAccount, icoCpl, lower_ask_2_val, minTradbleQtty);
-                log.info("\n$$$$$$$ buy "+lowerEx+"<=cp="+icoCpl+" <=bidval="+lower_ask_2_val+"<=qtty= "+minTradbleQtty+"  $$$$$$$$$$ \n"+ JSON.toJSON(res2));
-
-            } catch (Exception e) {
-                log.error("buy 失败",e);
-                return  5;
-            }
 
             Double coinNum= highIcoAccount.getIcoValue(icoCpl);
-           Double btcNum=  highIcoAccount.getBtc();
-           Double coinNumLow= lowIcoAccount.getIcoValue(icoCpl);
-           Double btcNumLow=  lowIcoAccount.getBtc();
-
-
+            Double btcNum=  highIcoAccount.getBtc();
+            Double coinNumLow= lowIcoAccount.getIcoValue(icoCpl);
+            Double btcNumLow=  lowIcoAccount.getBtc();
 
             // sell and  minus cost
             coinNum=coinNum-minTradbleQtty ;
@@ -260,12 +238,17 @@ public class TraderCore {
             lowIcoAccount.setIcoValue(icoCpl,coinNumLow);
             lowIcoAccount.setBtc(btcNumLow);
 
+            judgeResult.setUserId(context.getUserId());
+            judgeResult.setBuyPrice(lower_ask_2_val);
+            judgeResult.setSellPrice(higher_bid_2_val);
+            judgeResult.setStatus(1);
+            judgeResult.setQuantity(minTradbleQtty);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return 1;
+        return judgeResult;
 
     }
 }

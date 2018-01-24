@@ -3,10 +3,7 @@ package com.sdyc.service.exapi.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sdyc.beans.AccountBalances;
-import com.sdyc.beans.Depth;
-import com.sdyc.beans.ExAccount;
-import com.sdyc.beans.PriceBean;
+import com.sdyc.beans.*;
 import com.sdyc.service.exapi.DataService;
 import com.sdyc.sys.Config;
 import com.sdyc.utils.HttpUtilManager;
@@ -233,34 +230,12 @@ public class ZbServiceImpl  implements DataService{
     }
 
 
-    public JSONObject buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception{
-        String mycp=  getMyCp(currencyPair);
-
-        String BUY_URL = "https://api.gate.io/api2/1/private/buy";
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("currencyPair", mycp);
-        params.put("rate",String.valueOf(rate) );
-        params.put("amount", String.valueOf(amount));
-
-        HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doGateIoRequest("post", BUY_URL, params,exAccount.getKey(),exAccount.getSecret());
-        System.out.print(result);
-        return JSON.parseObject(result);
+    public ApiTradeResult buy(ExAccount exAccount,String currencyPair,Double rate, Double amount)throws Exception{
+      return  null;
     }
 
-    public JSONObject sell(ExAccount exAccount,String currencyPair,Double rate, Double amount) throws Exception {
-        String mycp=  getMyCp(currencyPair);
-        String SELL_URL = "https://api.gate.io/api2/1/private/sell";
-
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("currencyPair", mycp);
-        params.put("rate",  String.valueOf(rate));
-        params.put("amount",  String.valueOf(amount));
-
-        HttpUtilManager httpUtil = HttpUtilManager.getInstance();
-        String result = httpUtil.doGateIoRequest(  "post", SELL_URL, params,exAccount.getKey(),exAccount.getSecret() );
-        System.out.print(result);
-        return JSON.parseObject(result);
+    public ApiTradeResult sell(ExAccount exAccount,String currencyPair,Double rate, Double amount) throws Exception {
+       return  null;
     }
 
     public JSONObject getOrder(ExAccount exAccount,String orderNumber, String currencyPair) throws Exception {
